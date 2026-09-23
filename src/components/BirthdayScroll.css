@@ -1,0 +1,240 @@
+.birthday-page {
+  min-height: 100svh;
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
+  position: relative;
+  overflow: hidden;
+  padding: 24px 16px;
+  color: #493842;
+  background:
+    radial-gradient(circle at 15% 15%, rgba(255, 211, 196, 0.65), transparent 30%),
+    radial-gradient(circle at 90% 85%, rgba(225, 183, 204, 0.5), transparent 34%),
+    #f7ebe5;
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+.birthday-page--accepted {
+  text-align: center;
+}
+
+.birthday-glow {
+  position: absolute;
+  width: 180px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  filter: blur(4px);
+  opacity: 0.7;
+}
+
+.birthday-glow--one {
+  top: -74px;
+  right: -52px;
+  background: #f5b9a8;
+}
+
+.birthday-glow--two {
+  bottom: -92px;
+  left: -70px;
+  background: #d7a8c2;
+}
+
+.birthday-scroll {
+  width: min(100%, 390px);
+  box-sizing: border-box;
+  position: relative;
+  isolation: isolate;
+  padding: 56px 28px 34px;
+  border: 1px solid rgba(139, 86, 95, 0.2);
+  border-radius: 4px 4px 18px 18px;
+  background: #fffaf5;
+  box-shadow: 0 24px 60px rgba(106, 62, 69, 0.18), 0 3px 0 #ead3c9;
+  text-align: center;
+}
+
+.birthday-scroll::before,
+.birthday-scroll::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  left: 6px;
+  right: 6px;
+  height: 16px;
+  border: 1px solid rgba(139, 86, 95, 0.17);
+  border-radius: 50%;
+  background: #fdf1e9;
+}
+
+.birthday-scroll::before {
+  top: -9px;
+}
+
+.birthday-scroll::after {
+  bottom: -9px;
+}
+
+.birthday-scroll__fold {
+  position: absolute;
+  top: 24px;
+  left: 50%;
+  width: 46px;
+  height: 1px;
+  transform: translateX(-50%);
+  background: #d9b6aa;
+}
+
+.birthday-scroll__seal,
+.birthday-thanks__heart {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  margin: 0 auto 22px;
+  border-radius: 50%;
+  color: #fffaf5;
+  background: #bd6872;
+  box-shadow: 0 5px 12px rgba(189, 104, 114, 0.25);
+  font-size: 19px;
+}
+
+.birthday-eyebrow {
+  margin: 0 0 12px;
+  color: #b05e69;
+  font-family: 'Trebuchet MS', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.19em;
+  text-transform: uppercase;
+}
+
+.birthday-scroll h1,
+.birthday-thanks h1 {
+  margin: 0;
+  color: #573b48;
+  font-size: clamp(32px, 9vw, 42px);
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  line-height: 1.08;
+}
+
+.birthday-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 23px 0 20px;
+  color: #c77e88;
+  font-size: 13px;
+}
+
+.birthday-divider::before,
+.birthday-divider::after {
+  content: '';
+  height: 1px;
+  flex: 1;
+  background: #e8cfc7;
+}
+
+.birthday-message {
+  margin: 0;
+  color: #745d65;
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+.birthday-message--closing {
+  margin-top: 14px;
+}
+
+.birthday-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 13px;
+  width: 100%;
+  margin-top: 28px;
+  padding: 14px 18px;
+  border: 0;
+  border-radius: 999px;
+  color: #fffaf7;
+  background: #bd6872;
+  box-shadow: 0 8px 18px rgba(189, 104, 114, 0.24);
+  cursor: pointer;
+  font-family: 'Trebuchet MS', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
+}
+
+.birthday-button:hover {
+  background: #aa5864;
+  box-shadow: 0 10px 22px rgba(189, 104, 114, 0.3);
+  transform: translateY(-2px);
+}
+
+.birthday-button:focus-visible {
+  outline: 3px solid #e1a9a6;
+  outline-offset: 3px;
+}
+
+.birthday-button span {
+  font-size: 20px;
+  line-height: 0;
+}
+
+.birthday-signoff {
+  margin: 18px 0 0;
+  color: #b17d7e;
+  font-size: 15px;
+  font-style: italic;
+}
+
+.birthday-thanks {
+  max-width: 360px;
+  padding: 34px 24px;
+}
+
+.birthday-thanks__heart {
+  margin-bottom: 24px;
+  animation: birthday-heartbeat 1.8s ease-in-out infinite;
+}
+
+.birthday-thanks__copy {
+  margin-top: 20px;
+  color: #745d65;
+  font-size: 18px;
+  line-height: 1.7;
+}
+
+@keyframes birthday-heartbeat {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  15% {
+    transform: scale(1.08);
+  }
+  30% {
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .birthday-thanks__heart {
+    animation: none;
+  }
+
+  .birthday-button {
+    transition: none;
+  }
+}
+
+@media (min-width: 600px) {
+  .birthday-page {
+    padding: 40px;
+  }
+
+  .birthday-scroll {
+    padding-inline: 44px;
+  }
+}
