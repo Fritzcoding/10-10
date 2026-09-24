@@ -1,0 +1,15 @@
+.friends-panel { display: grid; gap: 16px; text-align: left; }
+.friends-panel h2 { color: #fffaf7; margin: 0; }
+.friends-panel__intro, .friends-section p { color: rgba(255, 250, 247, 0.72); font-size: 13px; }
+.friends-search, .friends-section { display: grid; gap: 10px; }
+.friends-search label, .friends-section h3 { color: #fffaf7; font-size: 13px; font-weight: 600; }
+.friends-search__row { display: flex; gap: 8px; }
+.friends-search input { min-width: 0; flex: 1; }
+.friends-search input, .friends-card { border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 14px; background: rgba(255, 255, 255, 0.1); color: #fffaf7; }
+.friends-search input { padding: 12px; }
+.friends-card { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px; }
+.friends-card div { display: grid; gap: 2px; min-width: 0; }
+.friends-card strong, .friends-card span { overflow: hidden; text-overflow: ellipsis; }
+.friends-card span { color: rgba(255, 250, 247, 0.65); font-size: 12px; }
+.friends-card button, .friends-search button { border: 0; border-radius: 999px; padding: 9px 12px; color: #4a252b; background: #ffd8bc; font-weight: 700; white-space: nowrap; cursor: pointer; }
+.friends-message { color: #ffd8bc; font-size: 13px; }

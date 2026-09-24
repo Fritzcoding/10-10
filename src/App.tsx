@@ -26,7 +26,7 @@ function App() {
 
   if (view === 'birthday') return <BirthdayScroll onContinue={() => setView('auth')} />
   if (view === 'auth') return <AuthModal onAuthenticated={() => setView('hub')} />
-  return <Hub />
+  return <Hub onLogout={() => setView('auth')} />
 }
 
 export default App

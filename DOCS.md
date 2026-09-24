@@ -12,6 +12,18 @@
 - 4.2: `Stage 4.2: Add partner status badge`
 - 4.3: `Stage 4.3: Add Hub bottom navigation`
 
+## Stage 5: Social & Partner Management
+
+- [x] 5.1 - Friend Search & Request System
+- [x] 5.2 - Partner Request System
+- [x] 5.3 - Settings Screen
+
+### Stage 5 commit messages
+
+- 5.1: `Stage 5.1: Add friend search and requests`
+- 5.2: `Stage 5.2: Add partner request management`
+- 5.3: `Stage 5.3: Add user settings and logout`
+
 - [x] 2.2 - Audio Player & Unmute Logic
 - [x] 3.1 - Auth Modal UI
 - [x] 3.2 - Supabase Authentication Integration
