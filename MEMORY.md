@@ -1,5 +1,9 @@
 # Project Memory
 
+- Micro-Stage 4.1 is complete: `Hub` renders a full-screen styled couple backdrop and resumes the shared background audio.
+- Micro-Stage 4.2 is complete: `PartnerStatus` reads partner details from Supabase user metadata/profile data and renders paired or unpaired status.
+- Micro-Stage 4.3 is complete: `BottomNav` provides Games, Friends, and Settings tabs that switch the Hub panel.
+
 ## Current progress
 
 - Micro-Stage 1.2 is complete: the initial Vite app foundation and Supabase client integration are present.
