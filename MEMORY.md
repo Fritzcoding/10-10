@@ -9,3 +9,8 @@
 ## Verification
 
 - TypeScript verification: `npx tsc --noEmit`
+
+## New completed stages
+
+- Micro-Stage 2.2 is complete: `BirthdayScroll` starts looping background music through the shared audio helper when the user continues.
+- Micro-Stages 3.1 and 3.2 are complete: the glassmorphism auth modal supports login/register email-password flows through Supabase Auth and transitions to the Hub after authentication.

@@ -1,8 +1,19 @@
 import { useState } from 'react'
+import { startBackgroundMusic } from '../lib/audio'
 import './BirthdayScroll.css'
 
-function BirthdayScroll() {
+type BirthdayScrollProps = {
+  onContinue?: () => void
+}
+
+function BirthdayScroll({ onContinue }: BirthdayScrollProps) {
   const [isAccepted, setIsAccepted] = useState(false)
+
+  async function handleContinue() {
+    await startBackgroundMusic()
+    setIsAccepted(true)
+    onContinue?.()
+  }
 
   if (isAccepted) {
     return (
@@ -50,7 +61,7 @@ function BirthdayScroll() {
         <button
           type="button"
           className="birthday-button"
-          onClick={() => setIsAccepted(true)}
+          onClick={handleContinue}
         >
           Accept &amp; Continue
           <span aria-hidden="true">→</span>
