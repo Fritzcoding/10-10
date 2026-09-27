@@ -73,3 +73,6 @@ export default defineConfig([
 ])
 
 ```
+# Remote game notifications
+
+Remote Tic-Tac-Toe requests are persisted in Supabase and remain available in the top-of-app banner even when browser notifications are unavailable. To enable optional browser push, configure VAPID keys and deploy `supabase/functions/send-game-push` with `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `VAPID_PUBLIC_KEY`, and `VAPID_PRIVATE_KEY` secrets. Browser permission is requested only after an incoming-request gesture; denial does not affect the in-app fallback.

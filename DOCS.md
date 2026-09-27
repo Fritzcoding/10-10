@@ -54,3 +54,8 @@
 
 - [x] 1.2 — Initial app foundation and database/client integration
 - [x] 2.1 — Birthday Message Scroll UI
+## Remote multiplayer games
+
+Apply `supabase/migrations/202609280001_add_remote_game_play.sql` before using friend matches. Requests expire at exactly 60 seconds and the acceptance RPC enforces that deadline server-side. Realtime Presence determines online/offline grouping; persisted requests and notifications remain authoritative after reconnect.
+
+Optional push delivery uses `supabase/functions/send-game-push`. Store VAPID public/private keys only as Supabase Function secrets. The function is best-effort and must not replace the in-app banner.

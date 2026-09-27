@@ -33,3 +33,8 @@
 - UID search now selects only renderable profile fields, keeps the result card after adding, and provides direct realtime chat through the RLS-protected `direct_messages` table.
 - The deployed Supabase project must apply the new direct-message and friend-discovery policy migrations for cross-user search, friend-request insertion, and chat to work under RLS.
 - Search regression coverage now executes the numeric UID path with a query executor double and verifies UID `6` returns the expected profile; search readiness failures are surfaced instead of silently ignored.
+## Remote multiplayer games
+
+- Friend Tic-Tac-Toe uses Supabase requests/sessions with a 60-second guarded acceptance window.
+- Bot play is local; incoming requests render in the persistent Hub banner.
+- Browser push is optional; persisted notifications are the source of truth.

@@ -1,0 +1,9 @@
+.game-request-banner { display: grid; gap: 10px; margin-bottom: 14px; padding: 13px; border: 1px solid rgba(255, 255, 255, .24); border-radius: 18px; color: #fffaf7; background: rgba(108, 65, 130, .45); }
+.game-request-banner__heading, .game-request-banner__request { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.game-request-banner__heading span, .game-request-banner__request small { color: rgba(255, 247, 241, .7); font-size: 11px; }
+.game-request-banner__request { padding-top: 9px; border-top: 1px solid rgba(255, 255, 255, .13); }
+.game-request-banner__request div:first-child { display: grid; gap: 3px; }
+.game-request-banner__actions { display: flex; gap: 6px; }
+.game-request-banner button { border: 0; border-radius: 999px; padding: 7px 10px; color: #4a254c; background: #ffe0cf; font: inherit; font-size: 11px; cursor: pointer; }
+.game-request-banner__actions button:last-child { color: #fffaf7; background: rgba(255, 255, 255, .14); }
+.game-request-banner__notification { width: 100%; text-align: left; }
