@@ -3,6 +3,7 @@ import { startBackgroundMusic } from '../lib/audio'
 import { supabase } from '../lib/supabase'
 import BottomNav, { type HubTab } from './BottomNav'
 import Friends from './Friends'
+import Games from './Games'
 import PartnerStatus from './PartnerStatus'
 import Settings from './Settings'
 import './Hub.css'
@@ -26,8 +27,6 @@ function Hub({ onLogout }: HubProps) {
     }
   }, [])
 
-  const panelCopy = ['Play together', 'A little fun for two.', 'Choose a game and make a new memory together.']
-
   return (
     <main className="hub-page">
       <div className="hub-page__backdrop" aria-hidden="true" />
@@ -41,7 +40,7 @@ function Hub({ onLogout }: HubProps) {
       <section className="hub-panel" aria-live="polite">
         {activeTab === 'friends' && <Friends />}
         {activeTab === 'settings' && <Settings onLogout={onLogout} />}
-        {activeTab === 'games' && <><p className="hub-panel__eyebrow">{panelCopy[0]}</p><h2>{panelCopy[1]}</h2><p>{panelCopy[2]}</p></>}
+        {activeTab === 'games' && <Games />}
       </section>
       <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
     </main>

@@ -1,0 +1,15 @@
+.tic-tac-toe { display: grid; gap: 18px; }
+.tic-tac-toe__header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.tic-tac-toe h2 { margin: 0; color: #fffaf7; font-family: Georgia, 'Times New Roman', serif; font-size: clamp(27px, 7vw, 36px); font-weight: 400; letter-spacing: -0.04em; line-height: 1.1; }
+.tic-tac-toe__reset { padding: 9px 11px; border: 1px solid rgba(255, 255, 255, 0.28); border-radius: 999px; color: #fffaf7; background: rgba(255, 255, 255, 0.12); font: inherit; font-size: 11px; cursor: pointer; }
+.tic-tac-toe__reset:hover, .tic-tac-toe__reset:focus-visible { background: rgba(255, 255, 255, 0.22); }
+.tic-tac-toe__reset:focus-visible { outline: 2px solid #ffe0cf; outline-offset: 3px; }
+.tic-tac-toe__status { display: flex; align-items: center; justify-content: space-between; color: #fffaf7; font-size: 15px; font-weight: 700; }
+.tic-tac-toe__status span { color: rgba(255, 247, 241, 0.64); font-size: 11px; font-weight: 400; }
+.tic-tac-toe__board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; padding: 12px; border: 1px solid rgba(255, 255, 255, 0.26); border-radius: 24px; background: rgba(255, 255, 255, 0.13); box-shadow: 0 18px 45px rgba(40, 21, 51, 0.2); backdrop-filter: blur(18px); }
+.tic-tac-toe__cell { display: grid; place-items: center; aspect-ratio: 1; min-width: 0; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 16px; color: #fffaf7; background: rgba(255, 255, 255, 0.11); font-family: Georgia, 'Times New Roman', serif; font-size: clamp(38px, 15vw, 66px); line-height: 1; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: background 160ms ease, transform 160ms ease; }
+.tic-tac-toe__cell:not(:disabled):hover, .tic-tac-toe__cell:not(:disabled):focus-visible { background: rgba(255, 255, 255, 0.24); transform: scale(1.02); }
+.tic-tac-toe__cell:focus-visible { outline: 2px solid #ffe0cf; outline-offset: 2px; }
+.tic-tac-toe__cell:disabled { cursor: default; }
+.tic-tac-toe__cell--x { color: #ffe1d1; }
+.tic-tac-toe__cell--o { color: #e7d9ff; }

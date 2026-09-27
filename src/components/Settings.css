@@ -3,6 +3,11 @@
 .settings-panel__intro, .settings-message { color: rgba(255, 250, 247, 0.72); font-size: 13px; }
 .settings-card { display: grid; gap: 10px; padding: 14px; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 14px; background: rgba(255, 255, 255, 0.1); color: #fffaf7; }
 .settings-card label { font-size: 13px; font-weight: 600; }
+.settings-card p { margin: 0; color: rgba(255, 250, 247, 0.64); font-size: 12px; line-height: 1.45; }
+.settings-uid-row { display: flex; align-items: center; gap: 8px; }
+.settings-uid { flex: 1; min-width: 0; padding: 11px 12px; border: 1px dashed rgba(255, 255, 255, 0.32); border-radius: 10px; color: #ffe1d1; background: rgba(0, 0, 0, 0.12); font-family: ui-monospace, Consolas, monospace; font-size: 14px; letter-spacing: 0.08em; }
+.settings-uid-row button { border: 0; border-radius: 999px; padding: 10px 14px; color: #4a252b; background: #ffd8bc; font-weight: 700; cursor: pointer; }
+.settings-uid-row button:disabled { opacity: 0.5; cursor: wait; }
 .settings-volume-row { display: flex; align-items: center; gap: 12px; }
 .settings-volume-row input { flex: 1; accent-color: #ffd8bc; }
 .settings-volume-row span { width: 42px; text-align: right; font-size: 13px; }
