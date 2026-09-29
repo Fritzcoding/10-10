@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { executeProfileSearch, formatProfileUid, friendRequestStatusLabel, normalizeFriendSearch, normalizeProfileSearchInput, profileSearchFields, profileSearchReadiness, profileSearchTarget } from '../src/lib/friendSearch.ts'
+import { authIdentifierTarget, executeProfileSearch, formatProfileUid, friendRequestStatusLabel, normalizeFriendSearch, normalizeProfileSearchInput, profileSearchFields, profileSearchReadiness, profileSearchTarget } from '../src/lib/friendSearch.ts'
 import { hasPendingRequest, partitionPendingRequests } from '../src/lib/friendRequests.ts'
 import { appendUniqueMessage, isConversationMessage } from '../src/lib/chat.ts'
 import { formatSupabaseDataError } from '../src/lib/supabaseErrors.ts'
@@ -31,6 +31,12 @@ test('normalizes email and numeric display UID search input', () => {
 test('builds type-safe profile search targets', () => {
   assert.deepEqual(profileSearchTarget('friend@example.com'), { field: 'email', value: 'friend@example.com' })
   assert.deepEqual(profileSearchTarget('42'), { field: 'display_uid', value: 42 })
+})
+
+test('routes auth identifiers to email or numeric display UID', () => {
+  assert.deepEqual(authIdentifierTarget(' user@example.com '), { field: 'email', value: 'user@example.com' })
+  assert.deepEqual(authIdentifierTarget(' 42 '), { field: 'display_uid', value: 42 })
+  assert.equal(authIdentifierTarget('not-an-email-or-uid'), null)
 })
 
 test('falls back to a placeholder when the profile UID is unavailable', () => {

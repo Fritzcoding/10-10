@@ -7,6 +7,7 @@ import Games from './Games'
 import PartnerStatus from './PartnerStatus'
 import Settings from './Settings'
 import GameRequestBanner from './GameRequestBanner'
+import Profile from './Profile'
 import './Hub.css'
 
 type HubProps = { onLogout: () => void }
@@ -41,6 +42,7 @@ function Hub({ onLogout }: HubProps) {
       <GameRequestBanner userId={userId} />
       <section className="hub-panel" aria-live="polite">
         {activeTab === 'friends' && <Friends />}
+        {activeTab === 'profile' && <Profile />}
         {activeTab === 'settings' && <Settings onLogout={onLogout} />}
         {activeTab === 'games' && <Games />}
       </section>

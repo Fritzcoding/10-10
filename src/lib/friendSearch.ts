@@ -8,6 +8,14 @@ export type ProfileSearchTarget = {
   value: string | number
 }
 
+export function authIdentifierTarget(input: string): ProfileSearchTarget | null {
+  const value = input.trim()
+  if (!value) return null
+  if (value.includes('@')) return { field: 'email', value: value.toLowerCase() }
+  if (/^\d+$/.test(value)) return { field: 'display_uid', value: Number(value) }
+  return null
+}
+
 export const profileSearchFields = 'id, display_uid, email, display_name'
 
 export type ProfileSearchResult<T> = { data: T | null; error: { message: string } | null }

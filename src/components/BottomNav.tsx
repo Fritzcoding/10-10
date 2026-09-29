@@ -1,12 +1,13 @@
-import { Gamepad2, Settings, UsersRound } from 'lucide-react'
+import { Gamepad2, Settings, UserCircle, UsersRound } from 'lucide-react'
 
-export type HubTab = 'games' | 'friends' | 'settings'
+export type HubTab = 'games' | 'friends' | 'profile' | 'settings'
 
 type BottomNavProps = { activeTab: HubTab; onTabChange: (tab: HubTab) => void }
 
 const tabs = [
   { id: 'games' as const, label: 'Games', icon: Gamepad2 },
   { id: 'friends' as const, label: 'Friends', icon: UsersRound },
+  { id: 'profile' as const, label: 'Profile', icon: UserCircle },
   { id: 'settings' as const, label: 'Settings', icon: Settings },
 ]
 

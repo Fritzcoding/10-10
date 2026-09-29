@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
+import { authIdentifierTarget } from '../lib/friendSearch'
 import { supabase } from '../lib/supabase'
 import './AuthModal.css'
 
@@ -11,7 +12,7 @@ type AuthModalProps = {
 
 function AuthModal({ onAuthenticated }: AuthModalProps) {
   const [mode, setMode] = useState<AuthMode>('login')
-  const [email, setEmail] = useState('')
+  const [identifier, setIdentifier] = useState('')
   const [password, setPassword] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -27,10 +28,29 @@ function AuthModal({ onAuthenticated }: AuthModalProps) {
 
     setIsSubmitting(true)
 
-    const result =
-      mode === 'login'
-        ? await supabase.auth.signInWithPassword({ email, password })
-        : await supabase.auth.signUp({ email, password })
+    const target = authIdentifierTarget(identifier)
+    if (!target) {
+      setErrorMessage('Enter your Gmail/email address or numeric in-game UID.')
+      setIsSubmitting(false)
+      return
+    }
+
+    let email = target.field === 'email' ? String(target.value) : ''
+    if (mode === 'login' && target.field === 'display_uid') {
+      const lookup = await supabase.from('profiles').select('email').eq('display_uid', target.value).maybeSingle()
+      if (lookup.error) { setErrorMessage(lookup.error.message); setIsSubmitting(false); return }
+      if (!lookup.data?.email) { setErrorMessage('No account was found for that in-game UID.'); setIsSubmitting(false); return }
+      email = lookup.data.email
+    }
+    if (mode === 'register' && target.field !== 'email') {
+      setErrorMessage('Registration requires an email address. Use your UID only when logging in.')
+      setIsSubmitting(false)
+      return
+    }
+
+    const result = mode === 'login'
+      ? await supabase.auth.signInWithPassword({ email, password })
+      : await supabase.auth.signUp({ email, password })
 
     setIsSubmitting(false)
 
@@ -79,13 +99,13 @@ function AuthModal({ onAuthenticated }: AuthModalProps) {
         </div>
 
         <form className="auth-form" onSubmit={handleSubmit}>
-          <label htmlFor="auth-email">Email</label>
+          <label htmlFor="auth-identifier">Email or in-game UID</label>
           <input
-            id="auth-email"
-            type="email"
-            autoComplete="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
+            id="auth-identifier"
+            type="text"
+            autoComplete="username"
+            value={identifier}
+            onChange={(event) => setIdentifier(event.target.value)}
             required
           />
 

@@ -4,6 +4,7 @@ import TicTacToe from './games/TicTacToe'
 import { useEffect } from 'react'
 import { createGameRequest } from '../lib/gameRequests'
 import { groupFriendsByPresence, useGamePresence, type FriendProfile } from '../lib/gamePresence'
+import { acceptedFriendIds } from '../lib/profileSocial'
 import { supabase } from '../lib/supabase'
 import './Games.css'
 
@@ -19,11 +20,16 @@ function Games() {
   useEffect(() => {
     if (!supabase || !userId) return
     const client = supabase
-    void client.from('friend_requests').select('requester_id, recipient_id').eq('status', 'accepted').or(`requester_id.eq.${userId},recipient_id.eq.${userId}`).then(async ({ data }) => {
-      const ids = (data ?? []).map((row) => row.requester_id === userId ? row.recipient_id : row.requester_id)
+    void client.from('friend_requests').select('requester_id, recipient_id, status').eq('status', 'accepted').or(`requester_id.eq.${userId},recipient_id.eq.${userId}`).then(async ({ data }) => {
+      const ids = acceptedFriendIds((data ?? []) as { requester_id: string; recipient_id: string; status: string }[], userId)
       if (!ids.length) return
       const result = await client.from('profiles').select('id, display_name, avatar_url').in('id', ids)
-      setFriends((result.data ?? []) as FriendProfile[])
+      if (!result.error) {
+        setFriends((result.data ?? []).map((profile) => ({ id: profile.id, display_name: profile.display_name ?? 'Friend', avatar_url: profile.avatar_url ?? null })))
+        return
+      }
+      const fallback = await client.from('profiles').select('id, display_name').in('id', ids)
+      setFriends((fallback.data ?? []).map((profile) => ({ id: profile.id, display_name: profile.display_name ?? 'Friend', avatar_url: null })))
     })
   }, [userId])
 

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
+import { pairedLabel } from '../lib/profileSocial'
 
 type PartnerStatusProps = { userId?: string }
 type PartnerDetails = { partnerId: string | null; partnerName: string | null }
@@ -42,9 +43,7 @@ function PartnerStatus({ userId }: PartnerStatusProps) {
     }
   }, [userId])
 
-  const label = partner.partnerId
-    ? `Paired with ${partner.partnerName ?? 'your partner'}`
-    : 'Not Paired Yet'
+  const label = pairedLabel(partner.partnerId, partner.partnerName)
 
   return (
     <div className="partner-status" aria-live="polite">
