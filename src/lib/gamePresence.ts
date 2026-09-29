@@ -10,6 +10,10 @@ export function groupFriendsByPresence(friends: FriendProfile[], onlineUserIds: 
   }
 }
 
+export function onlineUserIdsFromPresence(state: Record<string, Array<{ user_id?: string }>>): Set<string> {
+  return new Set(Object.values(state).flat().map((entry) => entry.user_id).filter((id): id is string => Boolean(id)))
+}
+
 export function useGamePresence(userId?: string) {
   const [onlineUserIds, setOnlineUserIds] = useState<Set<string>>(new Set())
   const [isConnected, setIsConnected] = useState(false)
@@ -24,10 +28,13 @@ export function useGamePresence(userId?: string) {
       channel = presenceChannel
         .on('presence', { event: 'sync' }, () => {
           const state = presenceChannel.presenceState() as Record<string, Array<{ user_id?: string }>>
-          setOnlineUserIds(new Set(Object.values(state ?? {}).flat().map((entry) => entry.user_id).filter((id): id is string => Boolean(id))))
+          setOnlineUserIds(onlineUserIdsFromPresence(state))
         })
-      channel.subscribe((status: string) => setIsConnected(status === 'SUBSCRIBED'))
-      void channel.track({ user_id: userId })
+      channel.subscribe((status: string) => {
+        const connected = status === 'SUBSCRIBED'
+        setIsConnected(connected)
+        if (connected) void presenceChannel.track({ user_id: userId })
+      })
     })
     return () => {
       active = false

@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { canAcceptGameRequest, isGameRequestActive, mergeGameRequests, partitionGameRequests, type GameRequest } from '../src/lib/gameRequests.ts'
+import { canAcceptGameRequest, gameRequestInsertPayload, isGameRequestActive, mergeGameRequests, partitionGameRequests, type GameRequest } from '../src/lib/gameRequests.ts'
 
 const request = (overrides: Partial<GameRequest> = {}): GameRequest => ({
   id: 'request-1', requester_id: 'alice', recipient_id: 'bob', game_type: 'tic-tac-toe', status: 'pending',
@@ -28,4 +28,8 @@ test('acceptance only allows active pending requests', () => {
   assert.equal(canAcceptGameRequest(request(), new Date('2026-09-28T00:00:59.999Z')), true)
   assert.equal(canAcceptGameRequest(request(), new Date('2026-09-28T00:01:00.000Z')), false)
   assert.equal(canAcceptGameRequest(request({ status: 'accepted' }), new Date('2026-09-28T00:00:30.000Z')), false)
+})
+
+test('request insert includes the authenticated requester for RLS', () => {
+  assert.deepEqual(gameRequestInsertPayload('me', 'friend'), { requester_id: 'me', recipient_id: 'friend', game_type: 'tic-tac-toe' })
 })

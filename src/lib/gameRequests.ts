@@ -34,10 +34,16 @@ export function mergeGameRequests(current: GameRequest[], incoming: GameRequest[
   return [...merged.values()]
 }
 
+export function gameRequestInsertPayload(requesterId: string, recipientId: string) {
+  return { requester_id: requesterId, recipient_id: recipientId, game_type: 'tic-tac-toe' as const }
+}
+
 export async function createGameRequest(recipientId: string): Promise<GameRequest> {
   const { supabase } = await import('./supabase.ts')
   if (!supabase) throw new Error('Supabase is not configured.')
-  const { data, error } = await supabase.from('game_requests').insert({ recipient_id: recipientId, game_type: 'tic-tac-toe' }).select().single()
+  const { data: authData, error: authError } = await supabase.auth.getUser()
+  if (authError || !authData.user) throw new Error(authError?.message ?? 'Sign in before sending a game request.')
+  const { data, error } = await supabase.from('game_requests').insert(gameRequestInsertPayload(authData.user.id, recipientId)).select().single()
   if (error) throw error
   return data as GameRequest
 }

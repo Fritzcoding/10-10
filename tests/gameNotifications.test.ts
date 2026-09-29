@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { groupFriendsByPresence } from '../src/lib/gamePresence.ts'
+import { groupFriendsByPresence, onlineUserIdsFromPresence } from '../src/lib/gamePresence.ts'
 import { isExpiredNotification, mergeUniqueGameRequests, unreadNotificationCount, type GameNotification } from '../src/lib/gameNotifications.ts'
 import type { GameRequest } from '../src/lib/gameRequests.ts'
 
@@ -9,6 +9,10 @@ const request = (id: string): GameRequest => ({ id, requester_id: 'a', recipient
 
 test('groups friends online first and treats absent presence as offline', () => {
   assert.deepEqual(groupFriendsByPresence([friend('offline'), friend('online')], new Set(['online'])), { online: [friend('online')], offline: [friend('offline')] })
+})
+
+test('extracts tracked user ids from Supabase presence state', () => {
+  assert.deepEqual([...onlineUserIdsFromPresence({ me: [{ user_id: 'me' }], friend: [{ user_id: 'friend' }] })], ['me', 'friend'])
 })
 
 test('merges duplicate requests and notifications idempotently', () => {
