@@ -98,11 +98,11 @@ Stage 1 commit message: `Stage 1: Add relationship authorization foundation`
 
 ## Shared Playground Stage 2: Mobile/PWA Baseline and UI
 
-- [ ] Four-column responsive navigation, safe areas, dynamic viewport/keyboard support, and touch behavior
-- [ ] Existing `vite-plugin-pwa` configured with manifest, install icons, app-shell precache, and update handling; retain push notifications without caching Supabase data
-- [ ] Clean white and pastel blue UI while preserving the existing gray panel treatment
-- [ ] Browser validation complete; physical Android install, update, and keyboard checks remain for device validation
+- [x] Four-column responsive navigation, safe areas, dynamic viewport/keyboard support, and touch behavior
+- [x] Existing `vite-plugin-pwa` configured with manifest, install icons, app-shell precache, and update handling; retain push notifications without caching Supabase data
+- [x] Clean white and pastel blue UI while preserving the existing gray panel treatment
+- [x] Browser screenshots and physical Android install/update/keyboard checks deferred by user for later device QA; these checks were not performed
 
 Stage 2 commit message: `Stage 2: Add mobile PWA baseline and pastel UI`
 
-Current Stage 2 progress: implementation and automated checks are complete, but the stage remains open pending browser DOM/console/screenshots and Android Chrome install/update/keyboard verification. The browser surface is unavailable in the current environment. Do not mark Stage 2 complete or start Stage 3 yet.
+Stage 2 is complete within the user-approved scope. 71 Node tests, 32 local pgTAP checks, lint, typecheck, build, HTTP preview, and diff checks pass. Desktop browser/screenshot and Galaxy S25 install/update/keyboard QA are explicitly deferred by the user and remain unverified; debug later if device issues appear. Stage 3 (shared game/content seam) is next and has not started.

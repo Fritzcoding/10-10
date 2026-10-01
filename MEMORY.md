@@ -94,13 +94,13 @@
 - Stage 1 completed locally on 2026-10-01. Migration `20260930173655_stage_1_relationship_authorization_foundation.sql` adds canonical couples/memberships, safe backfill, scoped RLS, transactional partner/request operations, and a revision-checked legal Tic-Tac-Toe move RPC.
 - Stage 1 pgTAP passed 32 checks; `npm test` passed 67; lint, typecheck, and production build passed. Global diff-check still reports only the documented pre-existing `.gitignore:86` blank line.
 - The Stage 1 migration is not applied to hosted Supabase. No two-account hosted test was performed.
-- Stage-specific plan: `docs/superpowers/plans/2026-10-01-stage-1-authorization-foundation.md`. Stage 2 is the current approved task; create/maintain its plan before code changes.
+- Stage-specific plan: `docs/superpowers/plans/2026-10-01-stage-1-authorization-foundation.md`. Stage 2 followed Stage 1 in a separate plan; Stage 3 is next.
 
 
 ## Shared Playground Stage 2 Progress
 
-- Stage 2 implementation is in the working tree, not complete: installed `vite-plugin-pwa` now emits an install manifest and auto-updating static-shell service worker. Existing push handling is imported into that root worker; no Supabase runtime caching is configured.
+- Stage 2 implementation is complete within the user-approved scope: installed `vite-plugin-pwa` emits an install manifest and auto-updating static-shell service worker. Existing push handling is imported into that root worker; no Supabase runtime caching is configured.
 - Added viewport-fit/keyboard metadata, safe-area and dynamic viewport rules, four-item nav layout, larger touch controls, and a white/pastel-blue theme with cool-gray hub panels. Auth screen now uses the same blue/white direction.
-- Verification: 71 tests, lint, `npx tsc --noEmit`, and production build pass; HTTP preview serves the manifest and generated worker. `git diff --check` still flags only pre-existing `.gitignore:86`. PWA build emits two pre-existing ineffective dynamic-import warnings.
-- Browser DOM/console/screenshot inspection was unavailable (no browser surface or executable in this environment); physical Galaxy S25 install/update/keyboard checks are pending. Do not mark Stage 2 complete or start Stage 3 until these are verified.
-- Stage 2 plan: `docs/superpowers/plans/2026-10-01-stage-2-mobile-pwa-ui.md`. No package was added.
+- Verification: 71 tests, lint, `npx tsc --noEmit`, and production build pass; HTTP preview serves the manifest and generated worker. `git diff --check` and cached diff checks pass on the current tree. PWA build emits two ineffective dynamic-import warnings.
+- User explicitly deferred desktop screenshots/console and physical Galaxy S25 install/update/keyboard QA to later; these checks were not performed and remain unverified. Stage 2 is recorded complete with this exception; Stage 3 is next and remains unstarted.
+- Stage 2 plan: `docs/superpowers/plans/2026-10-01-stage-2-mobile-pwa-ui.md`. No package was added. The preview command is available from the repo root (`C:\Users\User\Documents\1010\couple-app`), not `%TEMP%\couple-app-schema-audit`.

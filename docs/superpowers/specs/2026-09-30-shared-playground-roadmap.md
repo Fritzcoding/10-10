@@ -1,6 +1,6 @@
 # Shared Playground: Audit and Implementation Roadmap
 
-**Status:** Product direction approved for staged execution. Stage 0 baseline is complete. Stage 1 authorization foundation is implemented and locally verified; Stage 2 is in progress.
+**Status:** Product direction approved for staged execution. Stage 0 baseline, Stage 1 authorization foundation, and Stage 2 mobile/PWA implementation are complete. The user deferred browser screenshots and Galaxy S25 verification to later QA. Stage 3 is next; it has not started.
 
 ## Goal
 
@@ -115,12 +115,12 @@ Each stage is a separate implementation/review cycle. Finish and verify one stag
 
 ### Stage 2 — Mobile/PWA baseline
 
-- [ ] Fix responsive navigation columns, safe-area spacing, viewport/keyboard layout, and touch target issues; apply the approved white/light-blue visual theme while keeping gray panels.
-- [ ] Configure the installed PWA plugin, manifest, install icons, service-worker registration, and update strategy while retaining push handling and excluding private Supabase data from caches.
-- [ ] Verify the app shell and layouts in a browser; install/update and keyboard behavior on Android Chrome still require the user's phone.
+- [x] Fix responsive navigation columns, safe-area spacing, viewport/keyboard layout, and touch target issues; apply the approved white/light-blue visual theme while keeping gray panels.
+- [x] Configure the installed PWA plugin, manifest, install icons, service-worker registration, and update strategy while retaining push handling and excluding private Supabase data from caches.
+- [x] Browser screenshots and Android Chrome install/update/keyboard checks deferred by the user to later QA; those checks were not performed.
 
-**Progress (2026-10-01):** PWA config, manifest/icons, static-only app-shell precache, merged push handling, viewport/safe-area behavior, and the white/pastel-blue UI with gray panels are implemented. 71 tests, lint, typecheck, and build pass. Browser DOM/console/screenshots could not be verified because no browser surface/executable is available; Android install/update/keyboard behavior is also pending. Keep Stage 2 open.
-- **Exit:** Installed PWA shell works online and does not cache private server data.
+**Progress (2026-10-01):** PWA config, manifest/icons, static-only app-shell precache, merged push handling, viewport/safe-area behavior, and the white/pastel-blue UI with gray panels are implemented. The user accepted deferring manual desktop and Galaxy S25 QA so work can proceed; 71 Node tests, 32 local pgTAP checks, lint, typecheck, and build pass, and diff checks are clean.
+- [x] **Exit (accepted with deferred device QA):** Build and HTTP preview confirm the manifest and generated static-shell worker; no Supabase runtime cache is configured. Desktop screenshots/console checks and Galaxy S25 install/update/keyboard behavior remain unverified and may be debugged later.
 
 ### Stage 3 — Shared game/content seam
 

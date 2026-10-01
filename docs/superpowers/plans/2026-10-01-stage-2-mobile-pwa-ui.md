@@ -30,14 +30,14 @@
 
 - [x] Restyle the signed-in hub and login screen with white background and pale blue interactive surfaces; preserve a cool-gray hub panel.
 - [x] Improve phone flow, text contrast, content spacing, and landscape behavior without changing feature flows.
-- [ ] Inspect browser rendering, DOM, and console at desktop and mobile-sized viewports; capture screenshots. The available browser surface inventory was empty and no local browser executable is installed, so this could not be performed here.
+- [x] Browser rendering/DOM/console screenshots deferred by user to later QA; not performed.
 
 ### 4. Exit and record
 
-- [x] Run Node tests (71), lint, typecheck, and build; global diff check reports only the known pre-existing `.gitignore:86` blank line.
+- [x] Run Node tests (71), local pgTAP (32), lint, typecheck, and build; staged and unstaged diff checks pass.
 - [x] Update DOCS, roadmap, and MEMORY with implementation progress and remaining verification.
-- [ ] Android Chrome install/update/keyboard verification on Galaxy S25 remains pending.
+- [x] Android Chrome install/update/keyboard verification on Galaxy S25 explicitly deferred by user; remains unverified for later QA.
 
 ## Exit criteria
 
-The PWA manifest and generated service worker build correctly, push handler stays registered, only the static app shell is cached, gray panel styling and responsive rules are implemented, and automated checks pass. The stage remains open until browser DOM/console/screenshot inspection and physical Android install/update/keyboard behavior are verified.
+The PWA manifest and generated service worker build correctly, push handler stays registered, only the static app shell is cached, gray panel styling and responsive rules are implemented, and automated checks pass. User accepted completion with browser and Galaxy S25 install/update/keyboard QA deferred; those checks remain explicitly unverified.
