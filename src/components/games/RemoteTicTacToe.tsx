@@ -5,6 +5,7 @@ import TicTacToe from './TicTacToe'
 
 export default function RemoteTicTacToe({ session, userId }: { session: GameSession; userId: string }) {
   const [current, setCurrent] = useState(session)
+  const [moveMessage, setMoveMessage] = useState('')
   useEffect(() => {
     if (!supabase) return
     const client = supabase
@@ -12,5 +13,22 @@ export default function RemoteTicTacToe({ session, userId }: { session: GameSess
     return () => { void client.removeChannel(channel) }
   }, [session.id])
   const playerMark = current.player_x_id === userId ? 'X' : 'O'
-  return <TicTacToe mode="remote" playerMark={playerMark} remoteState={{ board: current.board, turn: current.turn }} onMove={(index) => { if (index >= 0) void submitRemoteMove(current, userId, index).then(setCurrent) }} />
+  async function submitMove(index: number) {
+    if (index < 0) return
+    setMoveMessage('')
+    try {
+      setCurrent(await submitRemoteMove(current, userId, index))
+    } catch (error) {
+      if (supabase) {
+        const { data } = await supabase.from('game_sessions').select('*').eq('id', current.id).maybeSingle()
+        if (data) setCurrent(data as GameSession)
+      }
+      const message = error instanceof Error ? error.message : ''
+      setMoveMessage(message.includes('stale_revision') ? 'The board changed. It’s refreshed; try again.' : 'Your move could not be saved. Please try again.')
+    }
+  }
+  return <>
+    <TicTacToe mode="remote" playerMark={playerMark} remoteState={{ board: current.board, turn: current.turn }} onMove={submitMove} />
+    {moveMessage && <p className="games-message" role="status">{moveMessage}</p>}
+  </>
 }

@@ -57,6 +57,10 @@ export function profileSearchTarget(input: string): ProfileSearchTarget | null {
   return { field: 'email', value: normalized }
 }
 
+export function profileSearchRpcPayload(target: ProfileSearchTarget) {
+  return { target_query: String(target.value) }
+}
+
 export function normalizeFriendSearch(input: string): FriendSearch | null {
   const value = normalizeProfileSearchInput(input)
   if (!value) return null

@@ -1,7 +1,16 @@
 import { useEffect, useState } from 'react'
 import type { RealtimeChannel } from '@supabase/supabase-js'
 
-export type FriendProfile = { id: string; display_name: string; avatar_url: string | null }
+export type FriendProfile = { id: string; display_name: string; avatar_url: string | null; email?: string | null; display_uid?: number | null }
+
+export function friendDisplayName(profile: { id: string; display_name?: string | null; email?: string | null; display_uid?: number | null }): string {
+  const displayName = profile.display_name?.trim()
+  if (displayName) return displayName
+  const email = profile.email?.trim()
+  if (email) return email
+  if (profile.display_uid !== null && profile.display_uid !== undefined) return `UID #${profile.display_uid}`
+  return 'Friend'
+}
 
 export function groupFriendsByPresence(friends: FriendProfile[], onlineUserIds: ReadonlySet<string>) {
   return {
@@ -10,8 +19,20 @@ export function groupFriendsByPresence(friends: FriendProfile[], onlineUserIds: 
   }
 }
 
+export function onlineFriendNames(friends: FriendProfile[], onlineUserIds: ReadonlySet<string>): string[] {
+  return friends.filter((friend) => onlineUserIds.has(friend.id)).map((friend) => friend.display_name)
+}
+
 export function onlineUserIdsFromPresence(state: Record<string, Array<{ user_id?: string }>>): Set<string> {
   return new Set(Object.values(state).flat().map((entry) => entry.user_id).filter((id): id is string => Boolean(id)))
+}
+
+export type PresenceConnectionState = 'connected' | 'disconnected' | 'error'
+
+export function presenceConnectionState(status: string): PresenceConnectionState {
+  if (status === 'SUBSCRIBED') return 'connected'
+  if (status === 'CLOSED') return 'disconnected'
+  return 'error'
 }
 
 export function useGamePresence(userId?: string) {
@@ -31,9 +52,14 @@ export function useGamePresence(userId?: string) {
           setOnlineUserIds(onlineUserIdsFromPresence(state))
         })
       channel.subscribe((status: string) => {
-        const connected = status === 'SUBSCRIBED'
-        setIsConnected(connected)
-        if (connected) void presenceChannel.track({ user_id: userId })
+        if (!active) return
+        const state = presenceConnectionState(status)
+        setIsConnected(state === 'connected')
+        if (state === 'connected') {
+          void presenceChannel.track({ user_id: userId }).catch(() => {
+            if (active) setIsConnected(false)
+          })
+        }
       })
     })
     return () => {

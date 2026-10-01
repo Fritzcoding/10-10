@@ -4,11 +4,13 @@ import BirthdayScroll from './components/BirthdayScroll'
 import Hub from './components/Hub'
 import { ensureCurrentProfile } from './lib/profile'
 import { supabase } from './lib/supabase'
+import DeveloperPairingHarness from './components/DeveloperPairingHarness'
 
 type AppView = 'birthday' | 'auth' | 'hub'
 
 function App() {
   const [view, setView] = useState<AppView>('birthday')
+  const isDeveloperPairingMode = new URLSearchParams(window.location.search).get('dev') === 'pairing'
 
   useEffect(() => {
     if (!supabase) return
@@ -26,6 +28,7 @@ function App() {
     }
   }, [])
 
+  if (isDeveloperPairingMode) return <DeveloperPairingHarness />
   if (view === 'birthday') return <BirthdayScroll onContinue={() => setView('auth')} />
   if (view === 'auth') return <AuthModal onAuthenticated={() => setView('hub')} />
   return <Hub onLogout={() => setView('auth')} />

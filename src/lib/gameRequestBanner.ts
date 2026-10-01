@@ -1,6 +1,17 @@
 import { isExpiredNotification, unreadNotificationCount, type GameNotification } from './gameNotifications.ts'
 import type { GameRequest } from './gameRequests.ts'
 
+export type RequestAction = 'accept' | 'decline'
+
+export function requestActionLabel(action: RequestAction, isPending: boolean): string {
+  if (!isPending) return action === 'accept' ? 'Accept' : 'Decline'
+  return action === 'accept' ? 'Accepting…' : 'Declining…'
+}
+
+export function requestSenderName(request: Pick<GameRequest, 'requester_id'>, names: Record<string, string>): string {
+  return names[request.requester_id] ?? 'A friend'
+}
+
 export function formatRemainingTime(seconds: number): string {
   const safe = Math.max(0, Math.ceil(seconds))
   return `${Math.floor(safe / 60)}:${String(safe % 60).padStart(2, '0')}`

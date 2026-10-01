@@ -1,6 +1,14 @@
 import { getGameOutcome, type Board, type Mark } from './ticTacToe.ts'
 
-export type GameSession = { id: string; game_type: 'tic-tac-toe'; player_x_id: string; player_o_id: string; board: Board; turn: Mark; status: 'active' | 'won' | 'draw' | 'abandoned'; winner: Mark | null }
+export type GameSession = { id: string; game_type: 'tic-tac-toe'; player_x_id: string; player_o_id: string; board: Board; turn: Mark; status: 'active' | 'won' | 'draw' | 'abandoned'; winner: Mark | null; revision: number }
+
+export function ticTacToeMoveRpcPayload(sessionId: string, revision: number, cell: number) {
+  return { target_session_id: sessionId, target_revision: revision, target_cell: cell }
+}
+
+export function isSessionForUser(session: Pick<GameSession, 'player_x_id' | 'player_o_id'>, userId: string): boolean {
+  return session.player_x_id === userId || session.player_o_id === userId
+}
 
 export function applyRemoteMove(session: GameSession, userId: string, index: number): GameSession {
   if (session.status !== 'active') throw new Error('Game is completed')
@@ -26,10 +34,10 @@ export async function createRemoteSession(requestId: string): Promise<GameSessio
 }
 
 export async function submitRemoteMove(session: GameSession, userId: string, index: number): Promise<GameSession> {
-  const next = applyRemoteMove(session, userId, index)
+  applyRemoteMove(session, userId, index)
   const { supabase } = await import('./supabase.ts')
   if (!supabase) throw new Error('Supabase is not configured.')
-  const { data, error } = await supabase.from('game_sessions').update({ board: next.board, turn: next.turn, status: next.status, winner: next.winner }).eq('id', session.id).eq('status', 'active').select().single()
+  const { data, error } = await supabase.rpc('submit_tic_tac_toe_move', ticTacToeMoveRpcPayload(session.id, session.revision, index))
   if (error) throw error
   return data as GameSession
 }

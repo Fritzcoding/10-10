@@ -14,6 +14,10 @@ export function isGameRequestActive(request: Pick<GameRequest, 'status' | 'expir
   return request.status === 'pending' && new Date(request.expires_at).getTime() > now.getTime()
 }
 
+export function getActiveGameRequests(requests: GameRequest[], now: Date): GameRequest[] {
+  return requests.filter((request) => isGameRequestActive(request, now))
+}
+
 export function canAcceptGameRequest(request: Pick<GameRequest, 'status' | 'expires_at'>, now: Date): boolean {
   return isGameRequestActive(request, now)
 }
@@ -23,6 +27,16 @@ export function partitionGameRequests(requests: GameRequest[], userId: string) {
     incoming: requests.filter((request) => request.recipient_id === userId),
     outgoing: requests.filter((request) => request.requester_id === userId),
   }
+}
+
+export function gameRequestPeerId(request: Pick<GameRequest, 'requester_id' | 'recipient_id'>, userId: string): string {
+  return request.requester_id === userId ? request.recipient_id : request.requester_id
+}
+
+export function gameRequestStatusLabel(request: Pick<GameRequest, 'requester_id' | 'recipient_id' | 'status'>, userId: string): string {
+  if (request.status === 'accepted') return 'Accepted'
+  if (request.status !== 'pending') return request.status[0].toUpperCase() + request.status.slice(1)
+  return request.requester_id === userId ? 'Request sent' : 'Wants to play'
 }
 
 export function mergeGameRequests(current: GameRequest[], incoming: GameRequest[]): GameRequest[] {
@@ -38,20 +52,34 @@ export function gameRequestInsertPayload(requesterId: string, recipientId: strin
   return { requester_id: requesterId, recipient_id: recipientId, game_type: 'tic-tac-toe' as const }
 }
 
-export async function createGameRequest(recipientId: string): Promise<GameRequest> {
+export function gameRequestRpcPayload(recipientId: string) {
+  return { target_recipient_id: recipientId }
+}
+
+export function gameRequestAcceptRpcPayload(requestId: string) {
+  return { target_request_id: requestId }
+}
+
+export function gameRequestDeclineRpcPayload(requestId: string) {
+  return { target_request_id: requestId }
+}
+
+export async function createGameRequest(recipientId: string): Promise<GameRequest & { wasExisting?: boolean }> {
   const { supabase } = await import('./supabase.ts')
   if (!supabase) throw new Error('Supabase is not configured.')
   const { data: authData, error: authError } = await supabase.auth.getUser()
   if (authError || !authData.user) throw new Error(authError?.message ?? 'Sign in before sending a game request.')
-  const { data, error } = await supabase.from('game_requests').insert(gameRequestInsertPayload(authData.user.id, recipientId)).select().single()
-  if (error) throw error
+  const { data, error } = await supabase.rpc('create_game_request', gameRequestRpcPayload(recipientId))
+  if (error) {
+    throw error
+  }
   return data as GameRequest
 }
 
 export async function acceptGameRequest(requestId: string): Promise<{ request: GameRequest; session_id: string }> {
   const { supabase } = await import('./supabase.ts')
   if (!supabase) throw new Error('Supabase is not configured.')
-  const { data, error } = await supabase.rpc('accept_game_request', { request_id: requestId })
+  const { data, error } = await supabase.rpc('accept_game_request', gameRequestAcceptRpcPayload(requestId))
   if (error) throw error
   return data as { request: GameRequest; session_id: string }
 }
@@ -59,6 +87,6 @@ export async function acceptGameRequest(requestId: string): Promise<{ request: G
 export async function declineGameRequest(requestId: string): Promise<void> {
   const { supabase } = await import('./supabase.ts')
   if (!supabase) throw new Error('Supabase is not configured.')
-  const { error } = await supabase.from('game_requests').update({ status: 'declined' }).eq('id', requestId).eq('status', 'pending')
+  const { error } = await supabase.rpc('decline_game_request', gameRequestDeclineRpcPayload(requestId))
   if (error) throw error
 }

@@ -5,29 +5,11 @@ import { pairedLabel } from '../lib/profileSocial'
 type PartnerStatusProps = { userId?: string }
 type PartnerDetails = { partnerId: string | null; partnerName: string | null }
 
-function getMetadataValue(metadata: Record<string, unknown> | undefined, keys: string[]) {
-  const value = keys.map((key) => metadata?.[key]).find((item) => typeof item === 'string')
-  return typeof value === 'string' && value.trim() ? value.trim() : null
-}
-
 async function loadPartnerDetails(userId?: string): Promise<PartnerDetails> {
   if (!supabase || !userId) return { partnerId: null, partnerName: null }
-
-  const { data: userData } = await supabase.auth.getUser()
-  const metadata = userData.user?.user_metadata as Record<string, unknown> | undefined
-  const metadataPartnerId = getMetadataValue(metadata, ['partner_id', 'partnerId'])
-  const metadataPartnerName = getMetadataValue(metadata, ['partner_name', 'partnerName'])
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('partner_id, partner_name')
-    .eq('id', userId)
-    .maybeSingle()
-  const profileData = profile as { partner_id?: string | null; partner_name?: string | null } | null
-
-  return {
-    partnerId: metadataPartnerId ?? profileData?.partner_id ?? null,
-    partnerName: metadataPartnerName ?? profileData?.partner_name ?? null,
-  }
+  const { data } = await supabase.rpc('get_couple_partner')
+  const profile = Array.isArray(data) ? data[0] as { id?: string; display_name?: string | null; email?: string | null } | undefined : undefined
+  return { partnerId: profile?.id ?? null, partnerName: profile?.display_name ?? profile?.email ?? null }
 }
 
 function PartnerStatus({ userId }: PartnerStatusProps) {
@@ -38,8 +20,13 @@ function PartnerStatus({ userId }: PartnerStatusProps) {
     loadPartnerDetails(userId).then((details) => {
       if (isMounted) setPartner(details)
     })
+    if (!supabase || !userId) return () => { isMounted = false }
+    const channel = supabase.channel(`partner-status-${userId}`).on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles' }, () => {
+      void loadPartnerDetails(userId).then((details) => { if (isMounted) setPartner(details) })
+    }).subscribe()
     return () => {
       isMounted = false
+      void supabase?.removeChannel(channel)
     }
   }, [userId])
 

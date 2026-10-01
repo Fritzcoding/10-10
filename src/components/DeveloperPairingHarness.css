@@ -1,0 +1,25 @@
+.dev-harness { min-height: 100svh; padding: 28px 18px 42px; color: #fffaf7; background: linear-gradient(145deg, #4b315b, #8f5874 54%, #d18c82); font-family: 'Trebuchet MS', sans-serif; }
+.dev-harness__header, .dev-harness__accounts, .dev-harness__request, .dev-harness__game { width: min(100%, 760px); margin: 0 auto; }
+.dev-harness__header { display: flex; justify-content: space-between; gap: 18px; align-items: flex-start; }
+.dev-harness__eyebrow { color: #ffd9c5; font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+.dev-harness h1 { max-width: 500px; margin: 8px 0; font-family: Georgia, serif; font-size: clamp(34px, 8vw, 60px); font-weight: 400; line-height: .98; }
+.dev-harness p { color: rgba(255,247,241,.76); line-height: 1.5; }
+.dev-harness__badge, .dev-account__uid { display: inline-flex; align-items: center; padding: 6px 9px; border: 1px solid rgba(255,255,255,.28); border-radius: 999px; background: rgba(40,22,49,.22); font-size: 11px; white-space: nowrap; }
+.dev-harness__accounts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 34px; }
+.dev-account, .dev-harness__request, .dev-harness__game { box-sizing: border-box; padding: 18px; border: 1px solid rgba(255,255,255,.26); border-radius: 20px; background: rgba(255,255,255,.13); backdrop-filter: blur(14px); }
+.dev-account { display: grid; gap: 20px; }
+.dev-account h2, .dev-harness__request h2, .dev-harness__game h2 { margin: 10px 0 0; font-family: Georgia, serif; font-size: 25px; font-weight: 400; }
+.dev-account__state { color: #ffdecf; font-size: 12px; }
+.dev-harness__request, .dev-harness__game { margin-top: 14px; }
+.dev-harness__request p { margin: 6px 0 14px; }
+.dev-harness__actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.dev-harness button, .dev-harness select { padding: 10px 13px; border: 0; border-radius: 999px; color: #4a254c; background: #ffe0cf; font: inherit; cursor: pointer; }
+.dev-harness button:disabled { opacity: .45; cursor: default; }
+.dev-harness__game-header { display: flex; justify-content: space-between; gap: 16px; align-items: flex-end; }
+.dev-harness__game-header p { margin: 5px 0 0; font-size: 13px; }
+.dev-harness__turn { display: grid; gap: 5px; color: rgba(255,247,241,.75); font-size: 11px; }
+.dev-board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; max-width: 360px; margin: 22px auto 0; }
+.dev-board button { aspect-ratio: 1; border: 1px solid rgba(255,255,255,.28); border-radius: 14px; color: #fffaf7; background: rgba(255,255,255,.14); font-family: Georgia, serif; font-size: clamp(28px, 8vw, 48px); }
+.dev-board button:disabled { opacity: 1; cursor: default; }
+.dev-harness__message { width: min(100%, 760px); margin: 14px auto 0; color: #ffe0cf; font-size: 13px; }
+@media (max-width: 560px) { .dev-harness__header { display: grid; } .dev-harness__accounts { grid-template-columns: 1fr; } .dev-harness__badge { justify-self: start; } }

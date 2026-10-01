@@ -1,7 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { authIdentifierTarget, executeProfileSearch, formatProfileUid, friendRequestStatusLabel, normalizeFriendSearch, normalizeProfileSearchInput, profileSearchFields, profileSearchReadiness, profileSearchTarget } from '../src/lib/friendSearch.ts'
-import { hasPendingRequest, partitionPendingRequests } from '../src/lib/friendRequests.ts'
+import { authIdentifierTarget, executeProfileSearch, formatProfileUid, friendRequestStatusLabel, normalizeFriendSearch, normalizeProfileSearchInput, profileSearchFields, profileSearchReadiness, profileSearchRpcPayload, profileSearchTarget } from '../src/lib/friendSearch.ts'
+import { friendRequestResponseRpcPayload, hasPendingRequest, partitionPendingRequests } from '../src/lib/friendRequests.ts'
 import { appendUniqueMessage, isConversationMessage } from '../src/lib/chat.ts'
 import { formatSupabaseDataError } from '../src/lib/supabaseErrors.ts'
 
@@ -31,6 +31,15 @@ test('normalizes email and numeric display UID search input', () => {
 test('builds type-safe profile search targets', () => {
   assert.deepEqual(profileSearchTarget('friend@example.com'), { field: 'email', value: 'friend@example.com' })
   assert.deepEqual(profileSearchTarget('42'), { field: 'display_uid', value: 42 })
+})
+
+test('profile lookup RPC receives a literal exact-match search value', () => {
+  assert.deepEqual(profileSearchRpcPayload(profileSearchTarget('42')!), { target_query: '42' })
+  assert.deepEqual(profileSearchRpcPayload(profileSearchTarget('Friend@example.com')!), { target_query: 'friend@example.com' })
+})
+
+test('friend acceptance RPC identifies the request and acceptance decision', () => {
+  assert.deepEqual(friendRequestResponseRpcPayload('request-1', true), { target_request_id: 'request-1', accept_request: true })
 })
 
 test('routes auth identifiers to email or numeric display UID', () => {
@@ -121,5 +130,12 @@ test('turns missing partner profile columns into an actionable migration message
   assert.equal(
     formatSupabaseDataError({ message: 'column profiles.partner_id does not exist' }),
     'Your database is missing partner profile columns. Apply the latest Supabase migrations, then reload the app.',
+  )
+})
+
+test('turns a missing game request RPC into an actionable migration message', () => {
+  assert.equal(
+    formatSupabaseDataError({ message: 'Could not find the function public.create_game_request(recipient_id) in the schema cache' }),
+    'Your database is missing the game request migration. Apply 202609300001_expire_game_requests.sql, then reload the app.',
   )
 })

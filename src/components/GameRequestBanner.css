@@ -7,3 +7,5 @@
 .game-request-banner button { border: 0; border-radius: 999px; padding: 7px 10px; color: #4a254c; background: #ffe0cf; font: inherit; font-size: 11px; cursor: pointer; }
 .game-request-banner__actions button:last-child { color: #fffaf7; background: rgba(255, 255, 255, .14); }
 .game-request-banner__notification { width: 100%; text-align: left; }
+.game-request-banner__error { margin: 0; color: #ffd0c3; font-size: 12px; }
+.game-request-banner button:disabled { opacity: .65; cursor: wait; }

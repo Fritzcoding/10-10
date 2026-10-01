@@ -4,6 +4,8 @@
 .hub-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; max-width: 720px; margin: 0 auto; }
 .hub-eyebrow, .hub-panel__eyebrow { margin: 0 0 8px; color: rgba(255, 241, 234, 0.76); font-size: 11px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; }
 .hub-header h1 { max-width: 220px; margin: 0; color: #fffaf7; font-family: Georgia, 'Times New Roman', serif; font-size: clamp(30px, 8vw, 46px); font-weight: 400; letter-spacing: -0.05em; line-height: 1.05; }
+.hub-header__meta { display: grid; justify-items: end; gap: 7px; }
+.hub-uid { padding: 4px 7px; border: 1px solid rgba(255, 255, 255, 0.24); border-radius: 999px; color: rgba(255, 247, 241, 0.8); background: rgba(40, 22, 49, 0.22); font-family: ui-monospace, Consolas, monospace; font-size: 10px; line-height: 1; }
 .partner-status { display: inline-flex; flex-shrink: 0; align-items: center; gap: 8px; padding: 9px 12px; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 999px; color: #fffaf7; background: rgba(255, 255, 255, 0.16); box-shadow: 0 0 20px rgba(255, 204, 197, 0.18); backdrop-filter: blur(14px); font-size: 11px; line-height: 1.2; }
 .partner-status__dot { width: 7px; height: 7px; border-radius: 50%; background: #ffd8bc; box-shadow: 0 0 10px #ffd8bc; }
 .hub-panel { width: min(100%, 430px); box-sizing: border-box; margin: clamp(100px, 25vh, 220px) auto 0; padding: 26px 24px; border: 1px solid rgba(255, 255, 255, 0.28); border-radius: 24px; background: rgba(255, 255, 255, 0.14); box-shadow: 0 22px 60px rgba(40, 21, 51, 0.22); backdrop-filter: blur(18px); }

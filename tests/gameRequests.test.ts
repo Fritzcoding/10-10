@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { canAcceptGameRequest, gameRequestInsertPayload, isGameRequestActive, mergeGameRequests, partitionGameRequests, type GameRequest } from '../src/lib/gameRequests.ts'
+import { canAcceptGameRequest, gameRequestAcceptRpcPayload, gameRequestDeclineRpcPayload, gameRequestInsertPayload, gameRequestPeerId, gameRequestRpcPayload, gameRequestStatusLabel, getActiveGameRequests, isGameRequestActive, mergeGameRequests, partitionGameRequests, type GameRequest } from '../src/lib/gameRequests.ts'
 
 const request = (overrides: Partial<GameRequest> = {}): GameRequest => ({
   id: 'request-1', requester_id: 'alice', recipient_id: 'bob', game_type: 'tic-tac-toe', status: 'pending',
@@ -32,4 +32,33 @@ test('acceptance only allows active pending requests', () => {
 
 test('request insert includes the authenticated requester for RLS', () => {
   assert.deepEqual(gameRequestInsertPayload('me', 'friend'), { requester_id: 'me', recipient_id: 'friend', game_type: 'tic-tac-toe' })
+})
+
+test('request RPC payload matches the unambiguous database parameter', () => {
+  assert.deepEqual(gameRequestRpcPayload('friend'), { target_recipient_id: 'friend' })
+})
+
+test('accept RPC payload matches the unambiguous database parameter', () => {
+  assert.deepEqual(gameRequestAcceptRpcPayload('request-1'), { target_request_id: 'request-1' })
+})
+
+test('decline uses its recipient-validated RPC instead of a direct table update', () => {
+  assert.deepEqual(gameRequestDeclineRpcPayload('request-1'), { target_request_id: 'request-1' })
+})
+
+test('request presentation identifies the other account and pending direction', () => {
+  const outgoing = request({ requester_id: 'me', recipient_id: 'friend' })
+  const incoming = request({ requester_id: 'friend', recipient_id: 'me' })
+  assert.equal(gameRequestPeerId(outgoing, 'me'), 'friend')
+  assert.equal(gameRequestPeerId(incoming, 'me'), 'friend')
+  assert.equal(gameRequestStatusLabel(outgoing, 'me'), 'Request sent')
+  assert.equal(gameRequestStatusLabel(incoming, 'me'), 'Wants to play')
+})
+
+test('active request list excludes pending rows that expired yesterday', () => {
+  const now = new Date('2026-09-29T00:00:00.000Z')
+  assert.deepEqual(getActiveGameRequests([
+    request({ expires_at: '2026-09-28T00:01:00.000Z' }),
+    request({ id: 'request-2', expires_at: '2026-09-29T00:01:00.000Z' }),
+  ], now).map((item) => item.id), ['request-2'])
 })

@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
 import { appendUniqueMessage, isConversationMessage, type ChatMessage } from '../lib/chat'
-import { hasPendingRequest, partitionPendingRequests } from '../lib/friendRequests'
-import { executeProfileSearch, friendRequestStatusLabel, formatProfileUid, profileSearchFields, profileSearchReadiness } from '../lib/friendSearch'
+import { friendRequestResponseRpcPayload, hasPendingRequest, partitionPendingRequests } from '../lib/friendRequests'
+import { executeProfileSearch, friendRequestStatusLabel, formatProfileUid, profileSearchReadiness, profileSearchRpcPayload } from '../lib/friendSearch'
 import { ensureCurrentProfile } from '../lib/profile'
 import { supabase } from '../lib/supabase'
 import { formatSupabaseDataError } from '../lib/supabaseErrors'
@@ -25,6 +25,7 @@ function Friends() {
   const [outgoingRequests, setOutgoingRequests] = useState<Request[]>([])
   const [allRequests, setAllRequests] = useState<Request[]>([])
   const [displayUid, setDisplayUid] = useState<number | null>(null)
+  const [partnerId, setPartnerId] = useState<string | null>(null)
   const [searchValue, setSearchValue] = useState('')
   const [searchResult, setSearchResult] = useState<Profile | null>(null)
   const [chatProfile, setChatProfile] = useState<Profile | null>(null)
@@ -117,8 +118,16 @@ function Friends() {
     setOutgoingRequests(partitionedRequests.outgoing)
   }
 
+  async function loadPartner() {
+    if (!supabase) return
+    const { data, error } = await supabase.rpc('get_couple_partner')
+    if (error) throw error
+    const partner = Array.isArray(data) ? data[0] as { id?: string } | undefined : undefined
+    setPartnerId(partner?.id ?? null)
+  }
+
   async function refresh(currentUserId: string) {
-    const results = await Promise.allSettled([loadFriends(currentUserId), loadRequests(currentUserId)])
+    const results = await Promise.allSettled([loadFriends(currentUserId), loadRequests(currentUserId), loadPartner()])
     const failedLoad = results.find((result): result is PromiseRejectedResult => result.status === 'rejected')
     if (failedLoad) throw failedLoad.reason
   }
@@ -181,10 +190,9 @@ function Friends() {
     try {
       const input = searchValue.trim()
       const data = await executeProfileSearch<Profile>(input, async (target) => {
-        const result = target.field === 'display_uid'
-          ? await client.from('profiles').select(profileSearchFields).eq('display_uid', target.value).maybeSingle()
-          : await client.from('profiles').select(profileSearchFields).ilike('email', String(target.value)).maybeSingle()
-        return { data: result.data as Profile | null, error: result.error }
+        const result = await client.rpc('search_profile', profileSearchRpcPayload(target))
+        const profile = Array.isArray(result.data) ? result.data[0] : null
+        return { data: profile as Profile | null, error: result.error }
       })
       if (!data || data.id === currentUserId) {
         setMessage('No other account found with that email or display UID.')
@@ -253,29 +261,7 @@ function Friends() {
 
   async function acceptRequest(request: Request) {
     if (!supabase || !userId) return
-    let error: { message: string } | null
-    if (request.request_type === 'partner') {
-      const [{ data: currentProfile, error: currentProfileError }, { data: requesterProfile, error: requesterProfileError }] = await Promise.all([
-        supabase.from('profiles').select('id, display_uid, email, display_name').eq('id', userId).maybeSingle(),
-        supabase.from('profiles').select('id, display_uid, email, display_name').eq('id', request.requester_id).maybeSingle(),
-      ])
-      error = currentProfileError ?? requesterProfileError
-      if (!error && currentProfile && requesterProfile) {
-        const currentName = currentProfile.display_name ?? currentProfile.email
-        const requesterName = requesterProfile.display_name ?? requesterProfile.email
-        const updates = await Promise.all([
-          supabase.from('profiles').update({ partner_id: requesterProfile.id, partner_name: requesterName }).eq('id', currentProfile.id),
-          supabase.from('profiles').update({ partner_id: currentProfile.id, partner_name: currentName }).eq('id', requesterProfile.id),
-          supabase.from('friend_requests').update({ status: 'accepted' }).eq('id', request.id).eq('recipient_id', userId),
-        ])
-        error = updates.find((result) => result.error)?.error ?? null
-      } else if (!error) {
-        error = { message: 'Unable to find both profiles for this partner request.' }
-      }
-    } else {
-      const result = await supabase.from('friend_requests').update({ status: 'accepted' }).eq('id', request.id).eq('recipient_id', userId)
-      error = result.error
-    }
+    const { error } = await supabase.rpc('respond_to_friend_request', friendRequestResponseRpcPayload(request.id, true))
     if (error) {
       setMessage(formatSupabaseDataError(error))
       return
@@ -287,6 +273,10 @@ function Friends() {
   async function sendPartnerRequest(friend: Profile) {
     if (!supabase || !userId) return
     setMessage('')
+    if (partnerId) {
+      setMessage('You already have a partner connection.')
+      return
+    }
     if (friend.partner_id) {
       setMessage('This friend already has a partner connection.')
       return
@@ -323,8 +313,8 @@ function Friends() {
           <div className="friends-card" key={friend.id}>
             <div><strong>{profileLabel(friend)}</strong><span>UID: #{friend.display_uid} · {friend.email}</span></div>
             <div className="friends-card__actions">
-              <button type="button" onClick={() => openChat(friend)}>Chat</button>
-              {!friend.partner_id && <button type="button" onClick={() => void sendPartnerRequest(friend)}>Partner Request</button>}
+              {friend.id === partnerId && <button type="button" onClick={() => openChat(friend)}>Chat</button>}
+              {!partnerId && !friend.partner_id && <button type="button" onClick={() => void sendPartnerRequest(friend)}>Partner Request</button>}
             </div>
           </div>
         ))}
@@ -342,7 +332,7 @@ function Friends() {
         <div className="friends-card">
           <div><strong>{profileLabel(searchResult)}</strong><span>UID: #{searchResult.display_uid} · {searchResult.email}</span></div>
           <div className="friends-card__actions">
-            <button type="button" onClick={() => openChat(searchResult)}>Chat</button>
+            {searchResult.id === partnerId && <button type="button" onClick={() => openChat(searchResult)}>Chat</button>}
             <button type="button" disabled={friends.some((friend) => friend.id === searchResult.id) || hasPendingRequest(allRequests, userId ?? '', searchResult.id)} onClick={() => void sendFriendRequest(searchResult)}>{friendRequestStatusLabel(friends.some((friend) => friend.id === searchResult.id), hasPendingRequest(allRequests, userId ?? '', searchResult.id))}</button>
           </div>
         </div>

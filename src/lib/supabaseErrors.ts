@@ -15,5 +15,13 @@ export function formatSupabaseDataError(error: SupabaseErrorLike): string {
     return 'Your database is missing partner profile columns. Apply the latest Supabase migrations, then reload the app.'
   }
 
+  if (message.includes('create_game_request') || message.includes('game_requests')) {
+    return 'Your database is missing the game request migration. Apply 202609300001_expire_game_requests.sql, then reload the app.'
+  }
+
+  if (message.includes('accept_game_request')) {
+    return 'Your database is missing the game acceptance migration. Apply 202609300003_fix_accept_game_request.sql, then reload the app.'
+  }
+
   return message
 }

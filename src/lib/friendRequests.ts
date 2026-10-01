@@ -19,3 +19,7 @@ export function hasPendingRequest(requests: RequestSummary[], currentUserId: str
         || (request.requester_id === otherUserId && request.recipient_id === currentUserId)),
   )
 }
+
+export function friendRequestResponseRpcPayload(requestId: string, accept: boolean) {
+  return { target_request_id: requestId, accept_request: accept }
+}

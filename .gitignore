@@ -23,3 +23,64 @@ dist-ssr
 *.sln
 *.sw?
 .superpowers/
+
+# --- Operating System Files ---
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.swp
+*.swo
+
+# --- IDEs and Text Editors ---
+# VS Code
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# JetBrains (IntelliJ, WebStorm, PyCharm, etc.)
+.idea/
+*.iml
+*.iws
+out/
+
+# Sublime Text
+*.sublime-workspace
+*.sublime-project
+
+# --- Logs and Databases ---
+*.log
+logs/
+*.sqlite
+*.sqlite3
+*.db
+
+# --- Environment and Secrets ---
+.env
+.env.local
+.env.*.local
+AGENTS.md
+MEMORY.md
+*.pem
+id_rsa
+id_rsa.pub
+
+# --- Build Outputs and Dependencies ---
+dist/
+build/
+target/
+node_modules/
+vendor/
+__pycache__/
+*.py[cod]
+*$py.class
+.next/
+.nuxt/
+

@@ -11,3 +11,12 @@
 .game-card__copy span { color: rgba(255, 247, 241, 0.68); font-size: 12px; }
 .game-card__arrow { color: rgba(255, 247, 241, 0.72); font-size: 22px; }
 .games-view__back { display: inline-flex; align-items: center; justify-self: start; gap: 6px; padding: 0; border: 0; color: rgba(255, 247, 241, 0.82); background: none; font: inherit; font-size: 13px; cursor: pointer; }
+.games-mode-picker { display: grid; gap: 10px; }
+.games-mode-picker h2 { margin: 0 0 4px; }
+.games-mode-picker > button { padding: 13px 15px; border: 1px solid rgba(255, 255, 255, .22); border-radius: 14px; color: #fffaf7; background: rgba(255, 255, 255, .12); text-align: left; font: inherit; cursor: pointer; }
+.games-friend-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0; border-top: 1px solid rgba(255, 255, 255, .13); }
+.games-friend-row div { display: grid; gap: 3px; }
+.games-friend-row small { color: rgba(255, 247, 241, .7); font-size: 11px; }
+.games-friend-row button { padding: 8px 11px; border: 0; border-radius: 999px; color: #4a254c; background: #ffe0cf; font: inherit; font-size: 11px; cursor: pointer; }
+.games-friend-row button:disabled { color: rgba(255, 247, 241, .72); background: rgba(255, 255, 255, .14); cursor: default; }
+.games-message { margin: 4px 0 0; color: #ffe0cf; font-size: 13px; }

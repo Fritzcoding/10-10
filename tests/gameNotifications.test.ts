@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { groupFriendsByPresence, onlineUserIdsFromPresence } from '../src/lib/gamePresence.ts'
+import { friendDisplayName, groupFriendsByPresence, onlineFriendNames, onlineUserIdsFromPresence, presenceConnectionState } from '../src/lib/gamePresence.ts'
 import { isExpiredNotification, mergeUniqueGameRequests, unreadNotificationCount, type GameNotification } from '../src/lib/gameNotifications.ts'
 import type { GameRequest } from '../src/lib/gameRequests.ts'
 
@@ -11,8 +11,24 @@ test('groups friends online first and treats absent presence as offline', () => 
   assert.deepEqual(groupFriendsByPresence([friend('offline'), friend('online')], new Set(['online'])), { online: [friend('online')], offline: [friend('offline')] })
 })
 
+test('names the friends currently online', () => {
+  assert.deepEqual(onlineFriendNames([{ ...friend('online'), display_name: 'Alex' }], new Set(['online'])), ['Alex'])
+})
+
+test('uses email or UID when a friend has no display name', () => {
+  assert.equal(friendDisplayName({ id: 'u1', display_name: null, email: 'alex@example.com', display_uid: 6 }), 'alex@example.com')
+  assert.equal(friendDisplayName({ id: 'u2', display_name: null, email: null, display_uid: 7 }), 'UID #7')
+})
+
 test('extracts tracked user ids from Supabase presence state', () => {
   assert.deepEqual([...onlineUserIdsFromPresence({ me: [{ user_id: 'me' }], friend: [{ user_id: 'friend' }] })], ['me', 'friend'])
+})
+
+test('maps realtime presence statuses to visible connection states', () => {
+  assert.equal(presenceConnectionState('SUBSCRIBED'), 'connected')
+  assert.equal(presenceConnectionState('CHANNEL_ERROR'), 'error')
+  assert.equal(presenceConnectionState('TIMED_OUT'), 'error')
+  assert.equal(presenceConnectionState('CLOSED'), 'disconnected')
 })
 
 test('merges duplicate requests and notifications idempotently', () => {

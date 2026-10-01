@@ -33,7 +33,7 @@
 - Missing profile UIDs display as `UID: #--`.
 - Commit: `fix: handle numeric input check and loading states in friends tab`
 - UID search results now remain visible after a friend request and expose a direct realtime chat panel backed by `direct_messages`.
-- Apply Supabase migrations `202609240002_add_direct_messages.sql` and `202609240003_add_friend_discovery_policies.sql` before testing search, requests, or chat against the deployed database.
+- The current Supabase schema is captured in `supabase/migrations/20260930161439_authoritative_remote_schema_baseline.sql`. Historical manual SQL files are preserved under `supabase/migrations-archive/pre-baseline-manual-sql/`; do not replay them as new migrations.
 - Search now reports a visible readiness error instead of silently returning when the authenticated profile is not initialized; the authenticated user ID is stored before secondary friends/request refreshes.
 
 ## Stage 6: Realtime Multiplayer Games
@@ -56,6 +56,53 @@
 - [x] 2.1 — Birthday Message Scroll UI
 ## Remote multiplayer games
 
-Apply `supabase/migrations/202609280001_add_remote_game_play.sql` before using friend matches. Requests expire at exactly 60 seconds and the acceptance RPC enforces that deadline server-side. Realtime Presence determines online/offline grouping; persisted requests and notifications remain authoritative after reconnect.
+The current baseline includes the remote game tables and policies. Historical SQL is retained in `supabase/migrations-archive/pre-baseline-manual-sql/` for reference and is not part of fresh database resets. Requests expire at exactly 60 seconds and the acceptance RPC enforces that deadline server-side. Realtime Presence determines online/offline grouping; persisted requests and notifications remain authoritative after reconnect.
+
+The current baseline includes this expiry behavior and enables realtime profile updates used by pairing status.
+
+The preserved historical migration `202609300002_fix_game_request_recipient_reference.sql` records the unambiguous `target_recipient_id` RPC parameter used by the current baseline.
+
+The preserved historical migration `202609300003_fix_accept_game_request.sql` records the unambiguous `target_request_id` parameter used by the current baseline.
+
+Local two-account developer verification is available at `/?dev=pairing`. It simulates UID 5 and UID 6 without Supabase writes, including request expiry, acceptance, and shared board moves.
 
 Optional push delivery uses `supabase/functions/send-game-push`. Store VAPID public/private keys only as Supabase Function secrets. The function is best-effort and must not replace the in-app banner.
+
+## Required browser and screenshot verification
+
+After changing request, friend, game, or other user-facing flows, verify the result in a browser and capture screenshots of the important states. Do not rely only on unit tests or a successful build.
+
+For game requests, use two authenticated browser sessions/accounts and verify:
+
+1. The sender sees the selected friend’s name, online/offline status, and a visible “Request sent” state.
+2. Sending the same request again shows the existing pending request instead of creating a duplicate or showing an unexplained database error.
+3. The receiver sees the sender’s name, game name, expiry, and Accept/Decline controls in the persistent request banner.
+4. Accepting the request moves both accounts directly into the same Tic-Tac-Toe game and both browsers show the same board after a move.
+5. Capture screenshots for the sent state, received state, accepted/shared-game state, and duplicate-request state.
+
+Web verification checklist: run `npm run dev`, open the app in a browser, inspect the visible UI after each action, check browser console errors, and record the tested accounts/steps alongside the screenshots before considering the change complete.
+
+Latest automated verification after Stage 1: 67 Node tests, 32 local Supabase pgTAP checks, lint, typecheck, and build pass. `git diff --check` reports the known pre-existing `.gitignore:86` extra blank line. Stage 1 remains unapplied on hosted Supabase; no two-account hosted test was performed.
+
+
+## Shared Playground Stage 1: Relationship and Authorization Foundation
+
+- [x] Canonical two-member couple membership and safe legacy backfill
+- [x] Couple-scoped profile, chat, request, and game-session authorization
+- [x] Transactional pairing and revision-checked Tic-Tac-Toe move RPC
+- [x] Retire the fixed public game broadcast channel
+- [x] Local verification: 32 Supabase pgTAP checks, 67 Node tests, lint, typecheck, and build pass
+- Hosted migration is not applied; no two-account hosted verification was performed. `git diff --check` flags the pre-existing `.gitignore:86` blank line only.
+
+Stage 1 commit message: `Stage 1: Add relationship authorization foundation`
+
+## Shared Playground Stage 2: Mobile/PWA Baseline and UI
+
+- [ ] Four-column responsive navigation, safe areas, dynamic viewport/keyboard support, and touch behavior
+- [ ] Existing `vite-plugin-pwa` configured with manifest, install icons, app-shell precache, and update handling; retain push notifications without caching Supabase data
+- [ ] Clean white and pastel blue UI while preserving the existing gray panel treatment
+- [ ] Browser validation complete; physical Android install, update, and keyboard checks remain for device validation
+
+Stage 2 commit message: `Stage 2: Add mobile PWA baseline and pastel UI`
+
+Current Stage 2 progress: implementation and automated checks are complete, but the stage remains open pending browser DOM/console/screenshots and Android Chrome install/update/keyboard verification. The browser surface is unavailable in the current environment. Do not mark Stage 2 complete or start Stage 3 yet.

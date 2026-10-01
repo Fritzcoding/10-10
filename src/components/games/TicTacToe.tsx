@@ -1,80 +1,24 @@
-import { useEffect, useRef, useState } from 'react'
-import type { RealtimeChannel } from '@supabase/supabase-js'
-import { applyMove, chooseBotMove, createInitialGameState, getGameOutcome, type Board, type GameState, type Mark } from '../../lib/ticTacToe'
-import { supabase } from '../../lib/supabase'
+import { useEffect, useState } from 'react'
+import { applyMove, chooseBotMove, createInitialGameState, getGameOutcome, type GameState, type Mark } from '../../lib/ticTacToe'
 import './TicTacToe.css'
-
-const GAME_ROOM_ID = 'game_room_id'
-
-type MovePayload = {
-  type: 'move'
-  board: Board
-  turn: Mark
-}
-
-function getPlayerMark(userId: string | undefined): Mark {
-  if (!userId) return 'X'
-  return Number.parseInt(userId.slice(-1), 16) % 2 === 0 ? 'X' : 'O'
-}
 
 export type TicTacToeMode = 'bot' | 'local' | 'remote'
 type TicTacToeProps = { mode?: TicTacToeMode; remoteState?: GameState; playerMark?: Mark; onMove?: (index: number) => void }
 
 function TicTacToe({ mode = 'local', remoteState, playerMark: requestedPlayerMark, onMove }: TicTacToeProps) {
   const [game, setGame] = useState<GameState>(createInitialGameState)
-  const [playerMark, setPlayerMark] = useState<Mark>('X')
-  const channelRef = useRef<RealtimeChannel | null>(null)
   const displayedGame = mode === 'remote' && remoteState ? remoteState : game
   const { winner, draw: isDraw } = getGameOutcome(displayedGame.board)
-  const effectivePlayerMark = requestedPlayerMark ?? playerMark
+  const effectivePlayerMark = requestedPlayerMark ?? 'X'
 
   useEffect(() => {
     if (mode !== 'bot' || displayedGame.turn !== 'O' || winner || isDraw) return
     const timer = window.setTimeout(() => {
       const move = chooseBotMove(displayedGame)
-      if (move !== null) broadcastGame(applyMove(displayedGame, move))
+      if (move !== null) setGame(applyMove(displayedGame, move))
     }, 350)
     return () => window.clearTimeout(timer)
-  // The callback intentionally uses the current channel ref and rendered state.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [displayedGame, isDraw, mode, requestedPlayerMark, winner])
-
-  useEffect(() => {
-    if (mode === 'bot' || mode === 'remote' || !supabase) return
-    const client = supabase
-
-    let isMounted = true
-    void client.auth.getUser().then(({ data }) => {
-      if (isMounted) setPlayerMark(getPlayerMark(data.user?.id))
-    })
-
-    const channel = client
-      .channel(GAME_ROOM_ID)
-      .on('broadcast', { event: 'move' }, ({ payload }: { payload: MovePayload }) => {
-        if (payload.type !== 'move' || payload.board.length !== 9) return
-        setGame({ board: payload.board, turn: payload.turn })
-      })
-
-    channelRef.current = channel
-    void channel.subscribe()
-
-    return () => {
-      isMounted = false
-      channelRef.current = null
-      void client.removeChannel(channel)
-    }
-  }, [mode])
-
-  function broadcastGame(nextGame: GameState) {
-    setGame(nextGame)
-    onMove?.(nextGame.board.findIndex((cell, index) => cell !== displayedGame.board[index]))
-    if (mode === 'bot' || mode === 'remote') return
-    void channelRef.current?.send({
-      type: 'broadcast',
-      event: 'move',
-      payload: { type: 'move', board: nextGame.board, turn: nextGame.turn } satisfies MovePayload,
-    })
-  }
+  }, [displayedGame, isDraw, mode, winner])
 
   const handleCellClick = (index: number) => {
     if (winner || isDraw || displayedGame.turn !== effectivePlayerMark || displayedGame.board[index]) return
@@ -82,10 +26,10 @@ function TicTacToe({ mode = 'local', remoteState, playerMark: requestedPlayerMar
       onMove?.(index)
       return
     }
-    broadcastGame(applyMove(displayedGame, index))
+    setGame(applyMove(displayedGame, index))
   }
 
-  const resetGame = () => { if (mode !== 'remote') broadcastGame(createInitialGameState()) }
+  const resetGame = () => setGame(createInitialGameState())
 
   return (
     <section className="tic-tac-toe" aria-labelledby="tic-tac-toe-title">
@@ -94,7 +38,7 @@ function TicTacToe({ mode = 'local', remoteState, playerMark: requestedPlayerMar
           <p className="hub-panel__eyebrow">A tiny classic</p>
           <h2 id="tic-tac-toe-title">Tic-Tac-Toe</h2>
         </div>
-        <button className="tic-tac-toe__reset" type="button" onClick={resetGame}>Reset Game</button>
+        {mode !== 'remote' && <button className="tic-tac-toe__reset" type="button" onClick={resetGame}>Reset Game</button>}
       </header>
       <div className="tic-tac-toe__status" aria-live="polite">
         {winner ? `${winner} wins!` : isDraw ? 'It’s a draw.' : `${displayedGame.turn}'s turn`}
