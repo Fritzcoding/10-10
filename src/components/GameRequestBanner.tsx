@@ -45,9 +45,12 @@ function GameRequestBanner({ userId, requests: initialRequests = [], notificatio
       }
     }
     void load()
-    const channel = client.channel(`game-requests-${userId}`).on('postgres_changes', { event: '*', schema: 'public', table: 'game_requests' }, () => void load()).on('postgres_changes', { event: '*', schema: 'public', table: 'notifications', filter: `user_id=eq.${userId}` }, () => void load())
-    void channel.subscribe()
-    return () => { active = false; void client.removeChannel(channel) }
+    const refresh = () => { void load() }
+    const channel = client.channel(`game-requests-${userId}`).on('postgres_changes', { event: '*', schema: 'public', table: 'game_requests' }, refresh).on('postgres_changes', { event: '*', schema: 'public', table: 'notifications', filter: `user_id=eq.${userId}` }, refresh)
+    void channel.subscribe((status) => { if (status === 'SUBSCRIBED') refresh() })
+    window.addEventListener('focus', refresh)
+    document.addEventListener('visibilitychange', refresh)
+    return () => { active = false; window.removeEventListener('focus', refresh); document.removeEventListener('visibilitychange', refresh); void client.removeChannel(channel) }
   }, [userId])
 
   const model = useMemo(() => buildGameRequestBannerModel(requests, notifications, now, userId ?? ''), [now, notifications, requests, userId])
@@ -61,6 +64,9 @@ function GameRequestBanner({ userId, requests: initialRequests = [], notificatio
       setRequests((current) => current.map((request) => request.id === requestId ? { ...request, status: 'accepted' } : request))
       onAccept?.(requestId, result.session_id)
     } catch (error) {
+      const { data } = await supabase?.from('game_requests').select('*').eq('id', requestId).maybeSingle() ?? { data: null }
+      if (data) setRequests((current) => current.map((request) => request.id === requestId ? data as GameRequest : request))
+      else setRequests((current) => current.filter((request) => request.id !== requestId))
       setActionError(formatSupabaseDataError(error as { message?: string | null }))
     } finally {
       setPendingAction(null)

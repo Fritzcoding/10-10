@@ -15,6 +15,10 @@ export function formatSupabaseDataError(error: SupabaseErrorLike): string {
     return 'Your database is missing partner profile columns. Apply the latest Supabase migrations, then reload the app.'
   }
 
+  if (message.includes('get_couple_partner') || message.includes('respond_to_friend_request')) {
+    return 'Your database is missing the relationship authorization migration. Apply 20260930173655_stage_1_relationship_authorization_foundation.sql, then reload the app.'
+  }
+
   if (message.includes('create_game_request') || message.includes('game_requests')) {
     return 'Your database is missing the game request migration. Apply 202609300001_expire_game_requests.sql, then reload the app.'
   }

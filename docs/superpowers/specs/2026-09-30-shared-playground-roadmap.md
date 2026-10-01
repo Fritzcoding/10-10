@@ -1,6 +1,6 @@
 # Shared Playground: Audit and Implementation Roadmap
 
-**Status:** Product direction approved for staged execution. Stage 0 baseline, Stage 1 authorization foundation, and Stage 2 mobile/PWA implementation are complete. The user deferred browser screenshots and Galaxy S25 verification to later QA. Stage 3 is next; it has not started.
+**Status:** Product direction approved for staged execution. Stage 0 baseline, Stage 1 authorization foundation, and Stage 2 mobile/PWA implementation are complete. Stage 3 code and database work is implemented locally; automated checks pass. Browser screenshots/console inspection remain pending because no browser provider was available in the implementation session. Do not mark Stage 3 complete until that check is done.
 
 ## Goal
 
@@ -124,10 +124,13 @@ Each stage is a separate implementation/review cycle. Finish and verify one stag
 
 ### Stage 3 — Shared game/content seam
 
-- [ ] Generalize Tic-Tac-Toe-specific catalog/request/session types without changing its working flows.
-- [ ] Add common metadata, lifecycle, server deadline, and authorized subscription patterns.
-- [ ] Add private submissions and reveal rules tested at the database layer.
+- [x] Generalize Tic-Tac-Toe-specific catalog/request/session types without changing its working flows.
+- [x] Add common metadata, lifecycle, server deadline, and authorized subscription patterns.
+- [x] Add private submissions and reveal rules tested at the database layer.
 - **Exit:** Tic-Tac-Toe still works and a second small hidden-answer game can use the seam without duplicating authorization/lifecycle.
+- [x] Audit function argument names and SECURITY DEFINER grants/search paths; reject Tic-Tac-Toe moves against other game types in PostgreSQL.
+- **Verification status:** Local code/database checks pass; browser screenshot and console inspection remain pending. Read-only linked inspection shows only the baseline migration is applied, explaining missing Stage 1 RPCs; no hosted writes or two-account verification were performed.
+- **Local app config:** Vite now reads app-local env files. `.env.development.local` selects the local Supabase API; the former parent-workspace env directory had pointed dev traffic at hosted Supabase.
 
 ### Stage 4 — First conversation games
 

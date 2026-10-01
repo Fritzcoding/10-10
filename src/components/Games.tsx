@@ -9,9 +9,9 @@ import { supabase } from '../lib/supabase'
 import { formatSupabaseDataError } from '../lib/supabaseErrors'
 import './Games.css'
 
-type GamesProps = { userId?: string; onlineUserIds: ReadonlySet<string>; activeSession?: GameSession | null; onSessionReady?: (session: GameSession) => void }
+type GamesProps = { userId?: string; onlineUserIds: ReadonlySet<string>; activeSession?: GameSession | null; onSessionReady?: (session: GameSession) => void; onSessionExit: () => void }
 
-function Games({ userId: authenticatedUserId, onlineUserIds, activeSession, onSessionReady }: GamesProps) {
+function Games({ userId: authenticatedUserId, onlineUserIds, activeSession, onSessionReady, onSessionExit }: GamesProps) {
   const [activeGame, setActiveGame] = useState<'tic-tac-toe' | null>(null)
   const [mode, setMode] = useState<'directory' | 'mode-picker' | 'friend-picker' | 'bot' | 'remote'>('directory')
   const userId = authenticatedUserId
@@ -44,10 +44,12 @@ function Games({ userId: authenticatedUserId, onlineUserIds, activeSession, onSe
       setRequests((data ?? []) as GameRequest[])
     }
     void loadRequests()
+    const refresh = () => { void loadRequests() }
     const channel = client.channel(`games-${userId}`)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'game_requests' }, () => void loadRequests())
-      .subscribe()
-    return () => { void client.removeChannel(channel) }
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'game_requests' }, refresh)
+      .subscribe((status) => { if (status === 'SUBSCRIBED') refresh() })
+    window.addEventListener('focus', refresh)
+    return () => { window.removeEventListener('focus', refresh); void client.removeChannel(channel) }
   }, [onSessionReady, userId])
 
   const sendRequest = async (friend: FriendProfile) => {
@@ -65,7 +67,7 @@ function Games({ userId: authenticatedUserId, onlineUserIds, activeSession, onSe
     const grouped = groupFriendsByPresence(friends, onlineUserIds)
     return (
       <div className="games-view">
-        <button className="games-view__back" type="button" onClick={() => { setActiveGame(null); setMode('directory') }}><ArrowLeft size={17} aria-hidden="true" />All games</button>
+        <button className="games-view__back" type="button" onClick={() => { setActiveGame(null); setMode('directory'); onSessionExit() }}><ArrowLeft size={17} aria-hidden="true" />All games</button>
         {remoteSession && <RemoteTicTacToe session={remoteSession} userId={userId ?? ''} />}
         {!remoteSession && mode === 'mode-picker' && <div className="games-mode-picker"><h2>How do you want to play?</h2><button type="button" onClick={() => setMode('bot')}>Play against Bot</button><button type="button" onClick={() => setMode('friend-picker')}>Play with a Friend</button></div>}
         {!remoteSession && mode === 'friend-picker' && <div className="games-mode-picker"><h2>Choose a friend</h2>{grouped.online.length > 0 && <p className="games-online-summary" aria-live="polite">Online now: {onlineFriendNames(friends, onlineUserIds).join(', ')}</p>}{[...grouped.online, ...grouped.offline].map((friend) => {

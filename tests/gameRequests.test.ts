@@ -32,10 +32,12 @@ test('acceptance only allows active pending requests', () => {
 
 test('request insert includes the authenticated requester for RLS', () => {
   assert.deepEqual(gameRequestInsertPayload('me', 'friend'), { requester_id: 'me', recipient_id: 'friend', game_type: 'tic-tac-toe' })
+  assert.deepEqual(gameRequestInsertPayload('me', 'friend', 'would-you-rather'), { requester_id: 'me', recipient_id: 'friend', game_type: 'would-you-rather' })
 })
 
 test('request RPC payload matches the unambiguous database parameter', () => {
   assert.deepEqual(gameRequestRpcPayload('friend'), { target_recipient_id: 'friend' })
+  assert.deepEqual(gameRequestRpcPayload('friend', 'would-you-rather'), { target_recipient_id: 'friend', target_game_type: 'would-you-rather' })
 })
 
 test('accept RPC payload matches the unambiguous database parameter', () => {

@@ -1,5 +1,9 @@
 # Project Progress
 
+## Current Dependencies
+
+- Playwright (`devDependency`): browser automation for local end-to-end flow verification.
+
 ## Stage 4: Core Hub Interface
 
 - [x] 4.1 - Hub Layout & Background
@@ -64,6 +68,8 @@ The preserved historical migration `202609300002_fix_game_request_recipient_refe
 
 The preserved historical migration `202609300003_fix_accept_game_request.sql` records the unambiguous `target_request_id` parameter used by the current baseline.
 
+Request banner now resyncs on Realtime subscription and browser focus, and refreshes the request after a rejected accept so stale cards are removed or updated. Server acceptance still enforces recipient, pending status, and expiry; verify hosted behavior with two accounts after the relevant SQL is deployed.
+
 Local two-account developer verification is available at `/?dev=pairing`. It simulates UID 5 and UID 6 without Supabase writes, including request expiry, acceptance, and shared board moves.
 
 Optional push delivery uses `supabase/functions/send-game-push`. Store VAPID public/private keys only as Supabase Function secrets. The function is best-effort and must not replace the in-app banner.
@@ -105,4 +111,18 @@ Stage 1 commit message: `Stage 1: Add relationship authorization foundation`
 
 Stage 2 commit message: `Stage 2: Add mobile PWA baseline and pastel UI`
 
-Stage 2 is complete within the user-approved scope. 71 Node tests, 32 local pgTAP checks, lint, typecheck, build, HTTP preview, and diff checks pass. Desktop browser/screenshot and Galaxy S25 install/update/keyboard QA are explicitly deferred by the user and remain unverified; debug later if device issues appear. Stage 3 (shared game/content seam) is next and has not started.
+Stage 2 is complete within the user-approved scope. 71 Node tests, 32 local pgTAP checks, lint, typecheck, build, HTTP preview, and diff checks pass. Desktop browser/screenshot and Galaxy S25 install/update/keyboard QA are explicitly deferred by the user and remain unverified; debug later if device issues appear. Stage 3 implementation progress is recorded below.
+
+## Shared Playground Stage 3: Shared Game and Hidden Answer Lifecycle
+
+- [x] Shared game IDs/catalog and backward-compatible Tic-Tac-Toe request/session types
+- [x] Server deadline and PostgreSQL-enforced hidden submission lifecycle with owner-only reads until both submit or the deadline
+  - [x] Local verification: 77 Node tests, 57 pgTAP checks, typecheck, lint, build, empty local schema diff, and security advisors clean
+  - [x] Function audit: local RPC argument names match client payloads; all SECURITY DEFINER functions pin an empty search path; no public SECURITY DEFINER function is callable by anon; Tic-Tac-Toe moves reject other game types in PostgreSQL
+  - [x] Local app routing: Vite had `envDir: '../'` and loaded the parent workspace's hosted URL. It now reads app-local env files; ignored `.env.development.local` points dev to local Supabase.
+  - [ ] Linked database is still at the authoritative baseline only: Stage 1 and Stage 3 migrations are not applied. This explains the missing relationship RPCs. Read-only inspection also found baseline SECURITY DEFINER functions executable by anon and broad profile/session policies; no hosted writes were made.
+- [x] Local two-account Playwright verification: receiver got the request without refresh, acceptance opened the shared session, and X/O moves synced both ways with zero console errors; screenshots and steps are in `docs/verification/remote-game/`
+
+Migration `20261001043638_stage_3_shared_game_content_seam.sql` is local only. Hosted migration and two-account verification remain pending.
+
+Debug finding (2026-10-01): current client move submission calls `submit_tic_tac_toe_move` with a session revision. Read-only hosted inspection confirms only the baseline migration is applied; that RPC and `game_sessions.revision` are absent, while the old broad participant UPDATE policy remains. The current client and hosted schema are incompatible. Do not claim hosted move correctness until the reviewed Stage 1 and Stage 3 migrations are deployed and the two-account flow passes.

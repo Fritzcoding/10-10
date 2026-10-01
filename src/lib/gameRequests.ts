@@ -1,9 +1,11 @@
+import type { GameId } from './gameCatalog.ts'
+
 export type GameRequestStatus = 'pending' | 'accepted' | 'declined' | 'expired'
 export type GameRequest = {
   id: string
   requester_id: string
   recipient_id: string
-  game_type: 'tic-tac-toe'
+  game_type: GameId
   status: GameRequestStatus
   expires_at: string
   created_at: string
@@ -48,12 +50,14 @@ export function mergeGameRequests(current: GameRequest[], incoming: GameRequest[
   return [...merged.values()]
 }
 
-export function gameRequestInsertPayload(requesterId: string, recipientId: string) {
-  return { requester_id: requesterId, recipient_id: recipientId, game_type: 'tic-tac-toe' as const }
+export function gameRequestInsertPayload(requesterId: string, recipientId: string, gameType: GameId = 'tic-tac-toe') {
+  return { requester_id: requesterId, recipient_id: recipientId, game_type: gameType }
 }
 
-export function gameRequestRpcPayload(recipientId: string) {
-  return { target_recipient_id: recipientId }
+export function gameRequestRpcPayload(recipientId: string, gameType: GameId = 'tic-tac-toe') {
+  return gameType === 'tic-tac-toe'
+    ? { target_recipient_id: recipientId }
+    : { target_recipient_id: recipientId, target_game_type: gameType }
 }
 
 export function gameRequestAcceptRpcPayload(requestId: string) {
@@ -64,12 +68,12 @@ export function gameRequestDeclineRpcPayload(requestId: string) {
   return { target_request_id: requestId }
 }
 
-export async function createGameRequest(recipientId: string): Promise<GameRequest & { wasExisting?: boolean }> {
+export async function createGameRequest(recipientId: string, gameType: GameId = 'tic-tac-toe'): Promise<GameRequest & { wasExisting?: boolean }> {
   const { supabase } = await import('./supabase.ts')
   if (!supabase) throw new Error('Supabase is not configured.')
   const { data: authData, error: authError } = await supabase.auth.getUser()
   if (authError || !authData.user) throw new Error(authError?.message ?? 'Sign in before sending a game request.')
-  const { data, error } = await supabase.rpc('create_game_request', gameRequestRpcPayload(recipientId))
+  const { data, error } = await supabase.rpc('create_game_request', gameRequestRpcPayload(recipientId, gameType))
   if (error) {
     throw error
   }

@@ -29,6 +29,4 @@ export default defineConfig({
       },
     }),
   ],
-  // The shared 1010 workspace stores its local Supabase env file one level up.
-  envDir: '../',
 })

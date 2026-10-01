@@ -23,7 +23,9 @@ function PartnerStatus({ userId }: PartnerStatusProps) {
     if (!supabase || !userId) return () => { isMounted = false }
     const channel = supabase.channel(`partner-status-${userId}`).on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles' }, () => {
       void loadPartnerDetails(userId).then((details) => { if (isMounted) setPartner(details) })
-    }).subscribe()
+    }).subscribe((status) => {
+      if (status === 'SUBSCRIBED') void loadPartnerDetails(userId).then((details) => { if (isMounted) setPartner(details) })
+    })
     return () => {
       isMounted = false
       void supabase?.removeChannel(channel)

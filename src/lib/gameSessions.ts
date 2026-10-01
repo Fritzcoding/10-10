@@ -1,6 +1,12 @@
 import { getGameOutcome, type Board, type Mark } from './ticTacToe.ts'
+import type { GameId } from './gameCatalog.ts'
+import { hiddenAnswerInsertPayload, type HiddenSubmissionResult, type WouldYouRatherAnswer } from './gameSubmissions.ts'
 
-export type GameSession = { id: string; game_type: 'tic-tac-toe'; player_x_id: string; player_o_id: string; board: Board; turn: Mark; status: 'active' | 'won' | 'draw' | 'abandoned'; winner: Mark | null; revision: number }
+export type GameSession = { id: string; game_type: GameId; player_x_id: string; player_o_id: string; board: Board; turn: Mark; status: 'active' | 'won' | 'draw' | 'abandoned' | 'completed'; winner: Mark | null; revision: number; deadline_at: string | null }
+
+export function latestGameSession(current: GameSession, incoming: GameSession): GameSession {
+  return incoming.revision >= current.revision ? incoming : current
+}
 
 export function ticTacToeMoveRpcPayload(sessionId: string, revision: number, cell: number) {
   return { target_session_id: sessionId, target_revision: revision, target_cell: cell }
@@ -11,6 +17,7 @@ export function isSessionForUser(session: Pick<GameSession, 'player_x_id' | 'pla
 }
 
 export function applyRemoteMove(session: GameSession, userId: string, index: number): GameSession {
+  if (session.game_type !== 'tic-tac-toe') throw new Error('This game does not support Tic-Tac-Toe moves')
   if (session.status !== 'active') throw new Error('Game is completed')
   const mark = userId === session.player_x_id ? 'X' : userId === session.player_o_id ? 'O' : null
   if (!mark) throw new Error('User is not a player')
@@ -40,4 +47,12 @@ export async function submitRemoteMove(session: GameSession, userId: string, ind
   const { data, error } = await supabase.rpc('submit_tic_tac_toe_move', ticTacToeMoveRpcPayload(session.id, session.revision, index))
   if (error) throw error
   return data as GameSession
+}
+
+export async function submitHiddenGameAnswer(sessionId: string, answer: WouldYouRatherAnswer): Promise<HiddenSubmissionResult> {
+  const { supabase } = await import('./supabase.ts')
+  if (!supabase) throw new Error('Supabase is not configured.')
+  const { data, error } = await supabase.rpc('submit_hidden_game_answer', hiddenAnswerInsertPayload(sessionId, answer))
+  if (error) throw error
+  return data as HiddenSubmissionResult
 }

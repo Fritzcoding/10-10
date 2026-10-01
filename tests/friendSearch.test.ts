@@ -139,3 +139,15 @@ test('turns a missing game request RPC into an actionable migration message', ()
     'Your database is missing the game request migration. Apply 202609300001_expire_game_requests.sql, then reload the app.',
   )
 })
+
+test('turns missing relationship RPCs into an actionable migration message', () => {
+  const expected = 'Your database is missing the relationship authorization migration. Apply 20260930173655_stage_1_relationship_authorization_foundation.sql, then reload the app.'
+  assert.equal(
+    formatSupabaseDataError({ message: 'Could not find the function public.get_couple_partner without parameters in the schema cache' }),
+    expected,
+  )
+  assert.equal(
+    formatSupabaseDataError({ message: 'Could not find the function public.respond_to_friend_request(accept_request, target_request_id) in the schema cache' }),
+    expected,
+  )
+})

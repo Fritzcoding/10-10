@@ -1,9 +1,15 @@
 begin;
-select plan(32);
+select plan(33);
 select has_table('public', 'couples', 'canonical couples table exists');
 select has_table('public', 'couple_members', 'couple membership is normalized and unique');
 select has_function('public', 'search_profile', array['text'], 'profile discovery is an explicit exact-match RPC');
 select has_function('public', 'respond_to_friend_request', array['uuid', 'boolean'], 'partner acceptance is a transactional RPC');
+select ok(
+  (select p.proargnames = array['target_request_id', 'accept_request']::text[]
+   from pg_catalog.pg_proc p
+   where p.oid = 'public.respond_to_friend_request(uuid,boolean)'::regprocedure),
+  'friend response RPC parameter names match the client payload'
+);
 select has_column('public', 'game_sessions', 'revision', 'game sessions carry a concurrency revision');
 select has_function('public', 'submit_tic_tac_toe_move', array['uuid', 'integer', 'integer'], 'moves use a revision-checked RPC');
 select has_function('public', 'get_couple_partner', array[]::text[], 'the current user can resolve only their canonical partner');

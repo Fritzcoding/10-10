@@ -32,7 +32,7 @@ export function acceptDeveloperGameRequest(state: DeveloperPairingState, request
   if (!request || request.status !== 'pending') throw new Error('Request is not pending')
   if (request.recipient_id !== userId) throw new Error('Only the recipient can accept this request')
   if (new Date(request.expires_at) <= now) throw new Error('Request expired')
-  const session: GameSession = { id: 'dev-session-1', game_type: 'tic-tac-toe', player_x_id: request.requester_id, player_o_id: request.recipient_id, board: emptyBoard(), turn: 'X', status: 'active', winner: null, revision: 0 }
+  const session: GameSession = { id: 'dev-session-1', game_type: 'tic-tac-toe', player_x_id: request.requester_id, player_o_id: request.recipient_id, board: emptyBoard(), turn: 'X', status: 'active', winner: null, revision: 0, deadline_at: null }
   return { session, requests: state.requests.map((item) => item.id === requestId ? { ...item, status: 'accepted' } : item) }
 }
 

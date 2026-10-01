@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { startBackgroundMusic } from '../lib/audio'
 import { supabase } from '../lib/supabase'
 import BottomNav, { type HubTab } from './BottomNav'
@@ -21,6 +21,7 @@ function Hub({ onLogout }: HubProps) {
   const [userId, setUserId] = useState<string>()
   const [displayUid, setDisplayUid] = useState<number | null>(null)
   const [activeSession, setActiveSession] = useState<GameSession | null>(null)
+  const currentUserId = useRef<string | undefined>(undefined)
   const { onlineUserIds } = useGamePresence(userId)
 
   const openSession = useCallback((session: GameSession) => {
@@ -34,30 +35,46 @@ function Hub({ onLogout }: HubProps) {
     const client = supabase
 
     let isMounted = true
-    client.auth.getUser().then(async ({ data }) => {
-      if (!data.user) return
-      const { data: profile } = await client.from('profiles').select('display_uid').eq('id', data.user.id).maybeSingle()
-      if (isMounted) { setUserId(data.user.id); setDisplayUid(profile?.display_uid ?? null) }
+    const updateUserId = (nextUserId?: string) => {
+      if (currentUserId.current === nextUserId) return
+      currentUserId.current = nextUserId
+      setUserId(nextUserId)
+      setDisplayUid(null)
+      setActiveSession(null)
+    }
+    client.auth.getUser().then(({ data }) => { if (isMounted) updateUserId(data.user?.id) })
+    const { data } = client.auth.onAuthStateChange((_event, session) => {
+      if (isMounted) updateUserId(session?.user.id)
     })
     return () => {
       isMounted = false
+      data.subscription.unsubscribe()
     }
   }, [])
 
   useEffect(() => {
     if (!supabase || !userId) return
+    let isMounted = true
+    void supabase.from('profiles').select('display_uid').eq('id', userId).maybeSingle().then(({ data }) => {
+      if (isMounted) setDisplayUid(data?.display_uid ?? null)
+    })
+    return () => { isMounted = false }
+  }, [userId])
+
+  useEffect(() => {
+    if (!supabase || !userId) return
     const client = supabase
     const loadActiveSession = async () => {
-      const { data } = await client.from('game_sessions').select('*').or(`player_x_id.eq.${userId},player_o_id.eq.${userId}`).eq('status', 'active').order('created_at', { ascending: false }).limit(1).maybeSingle()
+      const { data } = await client.from('game_sessions').select('*').or(`player_x_id.eq.${userId},player_o_id.eq.${userId}`).eq('game_type', 'tic-tac-toe').eq('status', 'active').order('created_at', { ascending: false }).limit(1).maybeSingle()
       if (data && isSessionForUser(data as GameSession, userId)) openSession(data as GameSession)
     }
     void loadActiveSession()
-    const channel = client.channel(`hub-game-sessions-${userId}`).on('postgres_changes', { event: '*', schema: 'public', table: 'game_sessions' }, () => void loadActiveSession()).subscribe()
+    const channel = client.channel(`hub-game-sessions-${userId}`).on('postgres_changes', { event: '*', schema: 'public', table: 'game_sessions' }, () => void loadActiveSession()).subscribe((status) => { if (status === 'SUBSCRIBED') void loadActiveSession() })
     return () => { void client.removeChannel(channel) }
   }, [openSession, userId])
 
   const loadSession = useCallback(async (sessionId: string) => {
-    const { data } = await supabase?.from('game_sessions').select('*').eq('id', sessionId).single() ?? { data: null }
+    const { data } = await supabase?.from('game_sessions').select('*').eq('id', sessionId).eq('game_type', 'tic-tac-toe').single() ?? { data: null }
     if (data) openSession(data as GameSession)
   }, [openSession])
 
@@ -76,7 +93,7 @@ function Hub({ onLogout }: HubProps) {
         {activeTab === 'friends' && <Friends />}
         {activeTab === 'profile' && <Profile />}
         {activeTab === 'settings' && <Settings onLogout={onLogout} />}
-        {activeTab === 'games' && <Games userId={userId} onlineUserIds={onlineUserIds} activeSession={activeSession} />}
+        {activeTab === 'games' && <Games userId={userId} onlineUserIds={onlineUserIds} activeSession={activeSession} onSessionExit={() => setActiveSession(null)} />}
       </section>
       <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
     </main>
