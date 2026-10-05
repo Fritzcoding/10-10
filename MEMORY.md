@@ -177,3 +177,11 @@
 - Verified a 384×832 CSS-pixel viewport with no horizontal overflow and no console errors after fresh reloads. Browser screenshots were captured during the task.
 - Verification passed: 88 Node tests, 103 local pgTAP checks, lint, TypeScript, production build, and `git diff --check`.
 - Created and removed two disposable local auth accounts and their temporary couple/game data. No hosted Stage 4 migration was deployed.
+
+## Shared Playground Stage 5 verified (2026-10-05)
+
+- Added Memory Match, Rock Paper Scissors, and Word Chain as local pass-and-play games. Bored Mode filters by time and partner availability, prefers games not played in the prior seven days, falls back to a recent game when that is the only fit, and shows a reason for each suggestion.
+- Recency is saved in device-local storage per signed-in user and updates when a shared game session is entered; no shared schema or dependency was added.
+- Browser inspection at 384×832 CSS pixels confirmed Bored Mode and Memory Match render without horizontal overflow; the preview console reported no errors. The temporary preview app skipped Supabase authentication, which was unavailable locally because the Supabase/Docker stack was not running. These new games are local-only, so authenticated two-account verification was not applicable. No hosted changes were made.
+- Verification: 99 Node tests, lint, `npx tsc --noEmit`, production build, and `git diff --check` passed. Build retains existing large-chunk and ineffective dynamic-import warnings.
+- Stage 5 plan: `docs/superpowers/plans/2026-10-05-stage-5-tiny-games.md`.

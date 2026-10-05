@@ -143,10 +143,11 @@ Each stage is a separate implementation/review cycle. Finish and verify one stag
 
 ### Stage 5 — Tiny games and Bored Mode
 
-- [ ] Add a first varied set of local-first, phone-friendly games from the approved list.
-- [ ] Add duration and recency metadata to the catalog.
-- [ ] Recommend by available time, availability, and recent play; avoid static random-only selection.
-- **Exit:** Recommendations are explainable and avoid repeatedly suggesting recently played games when alternatives fit.
+- [x] Add Memory Match, Rock Paper Scissors, and Word Chain as local-first, phone-friendly games.
+- [x] Recommend by available time, partner availability, and device-local recent play; explain each suggestion.
+- [x] Keep recent games out of recommendations when fresh fitting alternatives exist; use recent fits when no fresh option exists.
+- [x] **Exit:** Recommendations are explainable and avoid repeatedly suggesting recently played games when alternatives fit.
+- Verification: 99 Node tests, lint, TypeScript, production build, and `git diff --check` pass. The 384×832 browser preview confirmed Memory Match, Bored Mode, and no horizontal overflow; console overlay reported no errors. Authenticated multiplayer checks were unnecessary for these local-first screens; local Supabase was unavailable. No migration or hosted change was made.
 
 ### Stage 6 — Shared relationship layer
 

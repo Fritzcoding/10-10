@@ -93,7 +93,7 @@ function Hub({ onLogout }: HubProps) {
         {activeTab === 'friends' && <Friends />}
         {activeTab === 'profile' && <Profile />}
         {activeTab === 'settings' && <Settings onLogout={onLogout} />}
-        {activeTab === 'games' && <Games userId={userId} onlineUserIds={onlineUserIds} activeSession={activeSession} onSessionExit={() => setActiveSession(null)} />}
+        {activeTab === 'games' && <Games key={userId ?? 'guest'} userId={userId} onlineUserIds={onlineUserIds} activeSession={activeSession} onSessionExit={() => setActiveSession(null)} />}
       </section>
       <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
     </main>

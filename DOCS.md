@@ -52,6 +52,16 @@
 - 6.2: `Stage 6.2: Add Tic-Tac-Toe game board UI`
 - 6.3: `Stage 6.3: Add Supabase realtime game synchronization`
 
+## Shared Playground Stage 5: Tiny Games and Bored Mode
+
+- [x] Added Memory Match, Rock Paper Scissors, and Word Chain as local pass-and-play games.
+- [x] Bored Mode filters by available time and partner presence, accounts for per-user device-local recency, and explains recommendations.
+- [x] Verified at 384×832 CSS pixels with no horizontal overflow; the preview console showed no errors.
+- [x] Verification: 99 Node tests, lint, `npx tsc --noEmit`, production build, and `git diff --check` pass.
+- Authenticated two-account checks were not needed for these local-only game flows. Local Supabase was unavailable; no migration was deployed.
+
+Stage 5 commit message: `Stage 5: Add tiny games and Bored Mode`
+
 - [x] 2.2 - Audio Player & Unmute Logic
 - [x] 3.1 - Auth Modal UI
 - [x] 3.2 - Supabase Authentication Integration
