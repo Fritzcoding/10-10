@@ -1,6 +1,6 @@
 # Shared Playground: Audit and Implementation Roadmap
 
-**Status:** Product direction approved for staged execution. Stage 0 baseline, Stage 1 authorization foundation, and Stage 2 mobile/PWA implementation are complete. Stage 3 code and database work is implemented locally; automated checks pass. Browser screenshots/console inspection remain pending because no browser provider was available in the implementation session. Do not mark Stage 3 complete until that check is done.
+**Status:** Stages 0–4 are implemented and locally verified. Stage 4 passed two-account browser privacy/reveal flows and mobile viewport inspection; its migration remains local and has not been deployed to hosted Supabase.
 
 ## Goal
 
@@ -127,18 +127,19 @@ Each stage is a separate implementation/review cycle. Finish and verify one stag
 - [x] Generalize Tic-Tac-Toe-specific catalog/request/session types without changing its working flows.
 - [x] Add common metadata, lifecycle, server deadline, and authorized subscription patterns.
 - [x] Add private submissions and reveal rules tested at the database layer.
-- **Exit:** Tic-Tac-Toe still works and a second small hidden-answer game can use the seam without duplicating authorization/lifecycle.
+- [x] **Exit:** Tic-Tac-Toe still works and a second small hidden-answer game uses the seam without duplicating authorization/lifecycle.
 - [x] Audit function argument names and SECURITY DEFINER grants/search paths; reject Tic-Tac-Toe moves against other game types in PostgreSQL.
-- **Verification status:** Local code/database checks pass; browser screenshot and console inspection remain pending. Read-only linked inspection shows only the baseline migration is applied, explaining missing Stage 1 RPCs; no hosted writes or two-account verification were performed.
+- [x] **Verification:** Local two-account browser flows, screenshots, and console inspection passed; Stage 1 and Stage 3 were previously deployed separately, but no Stage 4 SQL was deployed.
 - **Local app config:** Vite now reads app-local env files. `.env.development.local` selects the local Supabase API; the former parent-workspace env directory had pointed dev traffic at hosted Supabase.
 
 ### Stage 4 — First conversation games
 
-- [ ] Question Card Game using categorized, provenance-aware prompts and couple-authored questions.
-- [ ] Who’s More Likely with independent private answers and simultaneous reveal.
-- [ ] Lie Detector with an initial 2-truths/1-lie mode and room for variants.
-- [ ] Describe Without Saying It with a licensed/original word source, optional forbidden words, and a deadline.
-- **Exit:** Each game has pure rule tests and a two-account privacy/reveal flow.
+- [x] Question Card Game using categorized, provenance-aware prompts and couple-authored questions.
+- [x] Who’s More Likely with independent private answers and simultaneous reveal.
+- [x] Lie Detector with an initial 2-truths/1-lie mode and room for variants.
+- [x] Describe Without Saying It with a licensed/original word source, optional forbidden words, and a deadline.
+- [x] **Exit:** Each game has pure rule tests and a two-account privacy/reveal flow.
+- [x] Local verification: 88 Node tests, 103 pgTAP checks, lint, TypeScript, production build, and diff check pass. Two authenticated local browser accounts exercised all four games; screenshots and mobile viewport/console checks were inspected. No hosted Stage 4 migration was applied.
 
 ### Stage 5 — Tiny games and Bored Mode
 

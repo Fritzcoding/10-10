@@ -98,7 +98,7 @@ Latest automated verification after Stage 1: 67 Node tests, 32 local Supabase pg
 - [x] Transactional pairing and revision-checked Tic-Tac-Toe move RPC
 - [x] Retire the fixed public game broadcast channel
 - [x] Local verification: 32 Supabase pgTAP checks, 67 Node tests, lint, typecheck, and build pass
-- Hosted migration is not applied; no two-account hosted verification was performed. `git diff --check` flags the pre-existing `.gitignore:86` blank line only.
+- Hosted migrations are applied; the partner backfill created one couple with two members. Hosted two-account verification remains pending. `git diff --check` flags the pre-existing `.gitignore:86` blank line only.
 
 Stage 1 commit message: `Stage 1: Add relationship authorization foundation`
 
@@ -120,9 +120,32 @@ Stage 2 is complete within the user-approved scope. 71 Node tests, 32 local pgTA
   - [x] Local verification: 77 Node tests, 57 pgTAP checks, typecheck, lint, build, empty local schema diff, and security advisors clean
   - [x] Function audit: local RPC argument names match client payloads; all SECURITY DEFINER functions pin an empty search path; no public SECURITY DEFINER function is callable by anon; Tic-Tac-Toe moves reject other game types in PostgreSQL
   - [x] Local app routing: Vite had `envDir: '../'` and loaded the parent workspace's hosted URL. It now reads app-local env files; ignored `.env.development.local` points dev to local Supabase.
-  - [ ] Linked database is still at the authoritative baseline only: Stage 1 and Stage 3 migrations are not applied. This explains the missing relationship RPCs. Read-only inspection also found baseline SECURITY DEFINER functions executable by anon and broad profile/session policies; no hosted writes were made.
+  - [x] Hosted Stage 1 and Stage 3 migrations applied and verified. Migration history and the couples, game submissions, Tic-Tac-Toe move RPC, hidden-answer RPC, and Realtime publication entries are present. One legacy partner pair was backfilled. Hosted two-account verification remains pending.
 - [x] Local two-account Playwright verification: receiver got the request without refresh, acceptance opened the shared session, and X/O moves synced both ways with zero console errors; screenshots and steps are in `docs/verification/remote-game/`
 
-Migration `20261001043638_stage_3_shared_game_content_seam.sql` is local only. Hosted migration and two-account verification remain pending.
+Hosted migrations: `20261001134451_stage_1_relationship_authorization_foundation.sql` and `20261001134519_stage_3_shared_game_content_seam.sql`. They were applied through the Supabase migration tool and local filenames now match the hosted versions. Hosted two-account verification remains pending.
 
-Debug finding (2026-10-01): current client move submission calls `submit_tic_tac_toe_move` with a session revision. Read-only hosted inspection confirms only the baseline migration is applied; that RPC and `game_sessions.revision` are absent, while the old broad participant UPDATE policy remains. The current client and hosted schema are incompatible. Do not claim hosted move correctness until the reviewed Stage 1 and Stage 3 migrations are deployed and the two-account flow passes.
+Debug finding (2026-10-01, before deployment): current client move submission calls `submit_tic_tac_toe_move` with a session revision. The pre-deployment hosted baseline lacked that RPC and `game_sessions.revision`, while the old broad participant UPDATE policy remained. Stage 1 and Stage 3 are now deployed; hosted two-account move behavior remains unverified.
+
+## Shared Playground Stage 4: Conversation Games
+
+- [x] Added Question Cards, Who’s More Likely, Lie Detector, and Describe Without Saying It to the shared game catalog and existing request/session/Hub routing.
+- [x] Added original categorized prompts, provenance, couple-authored questions, private submissions, alternating creator/guesser rounds, and server-enforced 60-second Describe timing.
+- [x] Added internal roadmap metadata for Stages 4–8 without future screens, handlers, or data models.
+- [x] Local two-account browser verification used separate Chrome and in-app browser sessions. All four games completed; paired answers remained private until reveal, and Lie Detector/Describe roles alternated. Sender identity, active requests, and the Describe timer were checked.
+- [x] Mobile-width screenshot review at 384×832 CSS pixels found no horizontal overflow; fresh browser reloads reported no console errors. Screenshots were captured during this task.
+- [x] Verification: 88 Node tests, 103 local pgTAP checks, lint, `npx tsc --noEmit`, build, and `git diff --check` pass.
+- Stage 4 migration remains local. It was not deployed to hosted Supabase.
+
+Stage 4 commit message: `Stage 4: Add private conversation games`
+## Shared Playground Stage 4: Conversation Games
+
+- [x] Added Question Cards, Who’s More Likely, Lie Detector, and Describe Without Saying It to the shared game catalog and existing request/session/Hub routing.
+- [x] Added original categorized prompts, provenance, couple-authored questions, private submissions, alternating creator/guesser rounds, and server-enforced 60-second Describe timing.
+- [x] Added internal roadmap metadata for Stages 4–8 without future screens, handlers, or data models.
+- [x] Local two-account browser verification used separate Chrome and in-app browser sessions. All four games completed; paired answers remained private until reveal, and Lie Detector/Describe roles alternated. Sender identity, active requests, and the Describe timer were checked.
+- [x] Mobile-width screenshot review at 384×832 CSS pixels found no horizontal overflow; fresh browser reloads reported no console errors. Screenshots were captured during this task.
+- [x] Verification: 88 Node tests, 103 local pgTAP checks, lint, `npx tsc --noEmit`, build, and `git diff --check` pass.
+- Stage 4 migration remains local. It was not deployed to hosted Supabase.
+
+Stage 4 commit message: `Stage 4: Add private conversation games`

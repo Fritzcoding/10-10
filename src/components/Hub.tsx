@@ -65,7 +65,7 @@ function Hub({ onLogout }: HubProps) {
     if (!supabase || !userId) return
     const client = supabase
     const loadActiveSession = async () => {
-      const { data } = await client.from('game_sessions').select('*').or(`player_x_id.eq.${userId},player_o_id.eq.${userId}`).eq('game_type', 'tic-tac-toe').eq('status', 'active').order('created_at', { ascending: false }).limit(1).maybeSingle()
+      const { data } = await client.from('game_sessions').select('*').or(`player_x_id.eq.${userId},player_o_id.eq.${userId}`).in('game_type', ['tic-tac-toe', 'question-cards', 'whos-more-likely', 'lie-detector', 'describe-without-saying-it']).eq('status', 'active').order('created_at', { ascending: false }).limit(1).maybeSingle()
       if (data && isSessionForUser(data as GameSession, userId)) openSession(data as GameSession)
     }
     void loadActiveSession()
@@ -74,7 +74,7 @@ function Hub({ onLogout }: HubProps) {
   }, [openSession, userId])
 
   const loadSession = useCallback(async (sessionId: string) => {
-    const { data } = await supabase?.from('game_sessions').select('*').eq('id', sessionId).eq('game_type', 'tic-tac-toe').single() ?? { data: null }
+    const { data } = await supabase?.from('game_sessions').select('*').eq('id', sessionId).in('game_type', ['tic-tac-toe', 'question-cards', 'whos-more-likely', 'lie-detector', 'describe-without-saying-it']).single() ?? { data: null }
     if (data) openSession(data as GameSession)
   }, [openSession])
 

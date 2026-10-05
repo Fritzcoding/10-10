@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { acceptGameRequest, declineGameRequest, type GameRequest } from '../lib/gameRequests'
 import { isExpiredNotification, type GameNotification } from '../lib/gameNotifications'
 import { buildGameRequestBannerModel, formatRemainingTime, requestActionLabel } from '../lib/gameRequestBanner'
+import { GAME_CATALOG } from '../lib/gameCatalog'
+import { friendDisplayName } from '../lib/gamePresence'
 import { supabase } from '../lib/supabase'
 import { formatSupabaseDataError } from '../lib/supabaseErrors'
 import './GameRequestBanner.css'
@@ -40,8 +42,8 @@ function GameRequestBanner({ userId, requests: initialRequests = [], notificatio
       if (active) { setRequests((requestRows ?? []) as GameRequest[]); setNotifications((notificationRows ?? []) as GameNotification[]) }
       const requesterIds = [...new Set((requestRows ?? []).filter((row) => row.recipient_id === userId).map((row) => row.requester_id))]
       if (requesterIds.length) {
-        const { data: profiles } = await client.from('profiles').select('id, display_name').in('id', requesterIds)
-        if (active) setProfileNames(Object.fromEntries((profiles ?? []).map((profile) => [profile.id, profile.display_name ?? 'A friend'])))
+        const { data: profiles } = await client.from('profiles').select('id, display_name, email, display_uid').in('id', requesterIds)
+        if (active) setProfileNames(Object.fromEntries((profiles ?? []).map((profile) => [profile.id, friendDisplayName(profile)])))
       }
     }
     void load()
@@ -88,7 +90,7 @@ function GameRequestBanner({ userId, requests: initialRequests = [], notificatio
   return <section className="game-request-banner" aria-label="Game requests">
     <div className="game-request-banner__heading"><strong>Game requests</strong>{model.unreadCount > 0 && <span>{model.unreadCount} unread</span>}</div>
     {model.requests.map(({ request, remainingSeconds }) => <article className="game-request-banner__request" key={request.id}>
-      <div><strong>{profileNames[request.requester_id] ?? 'A friend'} wants to play Tic-Tac-Toe</strong><small>Request from {profileNames[request.requester_id] ?? 'a friend'} · Expires in {formatRemainingTime(remainingSeconds)}</small></div>
+      <div><strong>{profileNames[request.requester_id] ?? 'A friend'} wants to play {GAME_CATALOG.find((game) => game.id === request.game_type)?.label ?? 'a game'}</strong><small>Request from {profileNames[request.requester_id] ?? 'a friend'} · Expires in {formatRemainingTime(remainingSeconds)}</small></div>
       <div className="game-request-banner__actions"><button type="button" disabled={Boolean(pendingAction)} onClick={() => void handleAccept(request.id)}>{requestActionLabel('accept', pendingAction?.requestId === request.id && pendingAction.action === 'accept')}</button><button type="button" disabled={Boolean(pendingAction)} onClick={() => void handleDecline(request.id)}>{requestActionLabel('decline', pendingAction?.requestId === request.id && pendingAction.action === 'decline')}</button></div>
     </article>)}
     {actionError && <p className="game-request-banner__error" role="alert">{actionError}</p>}

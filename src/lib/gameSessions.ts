@@ -1,8 +1,10 @@
 import { getGameOutcome, type Board, type Mark } from './ticTacToe.ts'
 import type { GameId } from './gameCatalog.ts'
-import { hiddenAnswerInsertPayload, type HiddenSubmissionResult, type WouldYouRatherAnswer } from './gameSubmissions.ts'
+import { conversationRoundSubmissionPayload, hiddenAnswerInsertPayload, type ConversationAnswer, type HiddenSubmissionResult, type WouldYouRatherAnswer } from './gameSubmissions.ts'
 
-export type GameSession = { id: string; game_type: GameId; player_x_id: string; player_o_id: string; board: Board; turn: Mark; status: 'active' | 'won' | 'draw' | 'abandoned' | 'completed'; winner: Mark | null; revision: number; deadline_at: string | null }
+export type GameSession = { id: string; game_type: GameId; player_x_id: string; player_o_id: string; board: Board; turn: Mark; status: 'active' | 'won' | 'draw' | 'abandoned' | 'completed'; winner: Mark | null; revision: number; deadline_at: string | null; current_round?: number }
+export type ConversationGameRound = { id: string; session_id: string; round_number: number; creator_id: string; prompt_id: string | null; public_state: Record<string, unknown> | null; deadline_at: string | null; status: 'active' | 'completed'; completed_at: string | null }
+export type ConversationGameSubmission = { round_id: string; user_id: string; answer: ConversationAnswer; submitted_at: string }
 
 export function latestGameSession(current: GameSession, incoming: GameSession): GameSession {
   return incoming.revision >= current.revision ? incoming : current
@@ -55,4 +57,36 @@ export async function submitHiddenGameAnswer(sessionId: string, answer: WouldYou
   const { data, error } = await supabase.rpc('submit_hidden_game_answer', hiddenAnswerInsertPayload(sessionId, answer))
   if (error) throw error
   return data as HiddenSubmissionResult
+}
+
+export async function startConversationGame(sessionId: string, promptId: string | null = null): Promise<ConversationGameRound> {
+  const { supabase } = await import('./supabase.ts')
+  if (!supabase) throw new Error('Supabase is not configured.')
+  const { data, error } = await supabase.rpc('start_conversation_game', { target_session_id: sessionId, target_prompt_id: promptId })
+  if (error) throw error
+  return data as ConversationGameRound
+}
+
+export async function submitConversationAnswer(roundId: string, answer: ConversationAnswer, publicState: Record<string, unknown> | null = null): Promise<{ submitted: true; revealed: boolean; submission_count: number; round_completed: boolean; session_completed: boolean }> {
+  const { supabase } = await import('./supabase.ts')
+  if (!supabase) throw new Error('Supabase is not configured.')
+  const { data, error } = await supabase.rpc('submit_conversation_game_answer', conversationRoundSubmissionPayload(roundId, answer, publicState))
+  if (error) throw error
+  return data
+}
+
+export async function getDescribeWord(roundId: string): Promise<{ word: string; forbidden: string[] }> {
+  const { supabase } = await import('./supabase.ts')
+  if (!supabase) throw new Error('Supabase is not configured.')
+  const { data, error } = await supabase.rpc('get_describe_game_word', { target_round_id: roundId })
+  if (error) throw error
+  return data as { word: string; forbidden: string[] }
+}
+
+export async function expireConversationRound(roundId: string): Promise<{ expired: boolean; round_completed: boolean; session_completed: boolean }> {
+  const { supabase } = await import('./supabase.ts')
+  if (!supabase) throw new Error('Supabase is not configured.')
+  const { data, error } = await supabase.rpc('expire_conversation_game_round', { target_round_id: roundId })
+  if (error) throw error
+  return data
 }

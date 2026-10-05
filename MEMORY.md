@@ -93,7 +93,7 @@
 
 - Stage 1 completed locally on 2026-10-01. Migration `20260930173655_stage_1_relationship_authorization_foundation.sql` adds canonical couples/memberships, safe backfill, scoped RLS, transactional partner/request operations, and a revision-checked legal Tic-Tac-Toe move RPC.
 - Stage 1 pgTAP passed 32 checks; `npm test` passed 67; lint, typecheck, and production build passed. Global diff-check still reports only the documented pre-existing `.gitignore:86` blank line.
-- The Stage 1 migration is not applied to hosted Supabase. No two-account hosted test was performed.
+- At the time of this entry, Stage 1 had not yet been applied to hosted Supabase; it was deployed on 2026-10-01 as hosted migration `20261001134451`. Hosted two-account verification remains pending.
 - Stage-specific plan: `docs/superpowers/plans/2026-10-01-stage-1-authorization-foundation.md`. Stage 2 followed Stage 1 in a separate plan; Stage 3 is next.
 
 
@@ -109,14 +109,21 @@
 
 - Implemented the shared `GameId` catalog and backward-compatible game request RPC defaults. Accepted hidden-answer sessions receive a five-minute database deadline; Tic-Tac-Toe sessions keep a null deadline and existing move RPC behavior.
 - Added `game_submissions`, an authenticated RPC that derives the submitter from `auth.uid()`, disallows duplicates/invalid answers/expired or wrong-game sessions, and completes after both submit. PostgreSQL RLS reveals submissions only to the owner until both submit or `deadline_at <= now()`; the table joins `supabase_realtime` under the same SELECT policy.
-- New local migration: `supabase/migrations/20261001043638_stage_3_shared_game_content_seam.sql`. Stage 0's nine archived migrations were not modified.
+- New local migration: `supabase/migrations/20261001134519_stage_3_shared_game_content_seam.sql` (hosted deployment version). Stage 0's nine archived migrations were not modified.
 - Local DB reset/replay passed. pgTAP: 57/57 (33 authorization + 24 Stage 3). Local schema diff is empty; security advisors found no issues. Final app checks: 77 Node tests, lint, typecheck, and build passed; build retains the two existing ineffective dynamic-import warning groups.
 - Full active-function audit: all local SECURITY DEFINER functions pin an empty search path; anon cannot execute any; `generate_profile_uid` is trigger-only; frontend RPC named arguments match SQL; and the Tic-Tac-Toe RPC now rejects non-Tic-Tac-Toe sessions at the database boundary without mutating them.
 - Local app error root cause fixed: `vite.config.ts` pointed Vite at the parent workspace `.env`, which targets hosted Supabase even after local migrations were replayed. Vite now uses the app directory, with ignored `.env.development.local` values from `supabase status`; a fresh dev server's transformed Supabase client targets `127.0.0.1:54321`. Local migrations include the missing relationship RPCs.
-- Read-only linked-database audit confirms only baseline `20260930161439` is applied; Stage 1 and Stage 3 are absent. Therefore `get_couple_partner()` and `respond_to_friend_request(...)` are not deployed, which explains both reported schema-cache errors. The same live baseline exposes four SECURITY DEFINER functions to anon and retains broad profile read/session update policies. No hosted writes were made; deploying the migrations remains explicitly out of scope.
+- Pre-deployment linked-database audit confirmed only baseline `20260930161439` was applied. Stage 1 and Stage 3 were later deployed on 2026-10-01 as `20261001134451` and `20261001134519`; see the deployment record below. The pre-deployment baseline exposed four SECURITY DEFINER functions to anon and retained broad profile read/session update policies.
 - Local two-account browser verification completed with Playwright on 2026-10-01: two isolated local accounts received a request without refresh, accepted into one shared Tic-Tac-Toe session, and synced moves in both directions. Duplicate send was disabled as “Request sent”; browser console had zero errors. Screenshots and steps: `docs/verification/remote-game/`. Temporary local accounts and sessions were removed; no hosted data was changed. Hosted two-account verification remains pending.
 - Follow-up bug fix: request banner refreshes on Realtime subscription and browser focus, clears/updates stale requests after accept errors, Games requests refresh on subscription/focus, partner status refetches on subscription, Hub refetches sessions on subscription, and the remote board refetches on subscription/focus.
 - Debug note: the accept RPC rejects requests unless the signed-in user is the recipient and the row is still pending and unexpired. Two-account Playwright verification passed against local Supabase; the reported rejection did not reproduce there. Since hosted Supabase has only the baseline migration applied, its exact failure remains unverified. Browser verification artifacts: `docs/verification/remote-game/`.
+
+## Hosted Supabase deployment (2026-10-01)
+
+- User authorized deploying the pending local migrations to hosted project `rophjogckmbkucowhhir`.
+- Applied Stage 1 and Stage 3 in order with Supabase's hosted migration tool. Hosted versions are `20261001134451_stage_1_relationship_authorization_foundation` and `20261001134519_stage_3_shared_game_content_seam`; local migration filenames were updated to match the hosted history.
+- Verified migration history contains baseline plus both stages; `couples`, `couple_members`, and `game_submissions` exist; `game_sessions.revision` exists; both game RPCs exist; `game_submissions` is in `supabase_realtime`; the safe legacy backfill created one couple with two members.
+- No hosted two-account flow was run after deployment. Historical hosted SECURITY DEFINER/public policy concerns from the baseline have not been re-audited after deployment.
 
 ## Verification workflow learned
 
@@ -129,18 +136,16 @@
 
 - Reproduced the likely stale-board race in a regression test: a newer Realtime game state can arrive before an earlier refetch or move RPC response, which then used to overwrite the new state. The next move would send an old revision, fail as stale, and recover only after a refetch/relogin.
 - Added `latestGameSession`, which keeps the higher server revision, and applied it to Realtime events, subscription/focus refetches, move RPC responses, and error recovery. Regression test failed before the helper existed and passes after the fix.
-- Read-only hosted audit: migration history contains only `20260930161439_authoritative_remote_schema_baseline`; hosted has neither `game_sessions.revision` nor `submit_tic_tac_toe_move`, though the current frontend requires both. Hosted still has the old participant UPDATE policy. Thus the deployed schema and current source are incompatible; local verification cannot certify the hosted game.
+- Pre-deployment hosted audit: migration history contained only `20260930161439_authoritative_remote_schema_baseline`; hosted lacked `game_sessions.revision` and `submit_tic_tac_toe_move`. Stage 1 and Stage 3 were applied later; see the deployment record below.
 - Hosted Realtime publication includes `game_sessions` and `game_requests`. Hosted aggregate inspection found one pending request whose expiry is already past, consistent with server-side expiration being enforced even when client countdown may be stale or clock-skewed. Exact cause of any shown countdown mismatch remains unproven.
-- This turn verification: 78 Node tests, lint, typecheck, build, and diff check pass. A new full local two-account run was blocked because Docker Engine access was denied; the prior Playwright run documented above passed. No hosted writes were made.
-- Next required action to establish hosted correctness: review and explicitly authorize deploying the already-existing Stage 1 and Stage 3 migrations, then repeat two-account Playwright against the hosted app. Do not deploy via an improvised browser fallback or direct data-table writes.
+- At the time of this entry, 78 Node tests, lint, typecheck, build, and diff check passed. A new full local two-account run was blocked because Docker Engine access was denied; the prior Playwright run documented above passed. Hosted deployment has since been authorized and completed; hosted two-account verification remains pending.
 
 ## Tic-Tac-Toe return navigation and migration readiness (2026-10-01)
 
 - Fixed the remote-game “All games” button: it now clears `Hub`'s owned `activeSession`, allowing `Games` to leave the remote-session view and render its directory. Added a regression check proving the exit callback is passed through.
 - Local `/?dev=pairing` browser simulation passed: Account 5 sent a request, Account 6 accepted, and both simulated players made alternating moves on the shared board. This uses the no-write developer harness, not authenticated Supabase accounts.
 - Verification passed: 79 Node tests, lint, typecheck, production build, and `git diff --check`. Build retains the two existing ineffective dynamic-import warning groups.
-- Hosted Supabase read-only check: only baseline migration `20260930161439` is recorded; Stage 1 and Stage 3 are pending. Hosted catalog lacks `couples`, `game_submissions`, `game_sessions.revision`, `submit_tic_tac_toe_move`, and `submit_hidden_game_answer`.
-- No hosted writes were made. The Supabase CLI was unavailable in the current shell and its `npx` bootstrap stalled; prior `db push --dry-run` was blocked by `cli_login_postgres` password authentication. Therefore hosted deployment readiness is not confirmed. Resolve CLI/database-role authentication, run a hosted dry run, then deploy the pending migrations and repeat the authenticated two-account check only after reviewing that plan.
+- Pre-deployment hosted check: only baseline migration `20260930161439` was recorded; Stage 1 and Stage 3 were pending. The migrations were deployed after this check; see the hosted deployment record below. The Supabase CLI was unavailable and its `npx` bootstrap stalled; prior `db push --dry-run` was blocked by `cli_login_postgres` password authentication, so deployment proceeded through the authenticated Supabase migration tool. Hosted two-account verification remains pending.
 
 ## Local two-tab request failure (2026-10-01)
 
@@ -163,3 +168,12 @@
 **Acceptance:** one documented command proves the two-account local flow; second run passes with no leaked QA users/data. Hosted verification remains a separate task requiring deployment of the pending migrations and explicit live-account setup.
 
 **Suggested next improvement after this:** resolve the hosted migration gap with a reviewed deployment plan, then run this same scenario with two hosted test accounts; do not mix migration deployment into the local smoke-test task.
+
+## Shared Playground Stage 4 verified (2026-10-05)
+
+- Implemented the four Stage 4 conversation games on the shared request/session flow, with internal metadata for Stages 4–8 only.
+- Two isolated local accounts in Chrome and the Codex in-app browser completed Question Cards, Who’s More Likely, Lie Detector (both alternating rounds), and Describe Without Saying It (both alternating rounds). Paired answers stayed hidden until reveal; sender identity and request receipt were checked.
+- Browser testing found and fixed two issues: completed Lie Detector/Describe history did not show round results, and the Describe timer began before the clue giver had seen the word. The timer now starts only after the clue giver views the word and explicitly starts the turn; expired first turns leave the next timer unstarted.
+- Verified a 384×832 CSS-pixel viewport with no horizontal overflow and no console errors after fresh reloads. Browser screenshots were captured during the task.
+- Verification passed: 88 Node tests, 103 local pgTAP checks, lint, TypeScript, production build, and `git diff --check`.
+- Created and removed two disposable local auth accounts and their temporary couple/game data. No hosted Stage 4 migration was deployed.
