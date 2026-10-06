@@ -53,7 +53,7 @@
 
 .bottom-nav {
   bottom: max(10px, env(safe-area-inset-bottom));
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   padding: 6px;
   border-color: var(--hub-line);
   border-radius: 18px;

@@ -5,9 +5,46 @@ import { conversationRoundSubmissionPayload, hiddenAnswerInsertPayload, type Con
 export type GameSession = { id: string; game_type: GameId; player_x_id: string; player_o_id: string; board: Board; turn: Mark; status: 'active' | 'won' | 'draw' | 'abandoned' | 'completed'; winner: Mark | null; revision: number; deadline_at: string | null; current_round?: number }
 export type ConversationGameRound = { id: string; session_id: string; round_number: number; creator_id: string; prompt_id: string | null; public_state: Record<string, unknown> | null; deadline_at: string | null; status: 'active' | 'completed'; completed_at: string | null }
 export type ConversationGameSubmission = { round_id: string; user_id: string; answer: ConversationAnswer; submitted_at: string }
+export type DrawingRound = { id: string; session_id: string; duration_seconds: number; subject: string | null; category: string | null; reference_path: string | null; started_at: string | null; deadline_at: string | null; status: 'waiting' | 'active' | 'completed'; completed_at: string | null }
+
+export async function setDrawingReference(sessionId: string, referencePath: string | null): Promise<DrawingRound> {
+  const { supabase } = await import('./supabase.ts')
+  if (!supabase) throw new Error('Supabase is not configured.')
+  const { data, error } = await supabase.rpc('set_drawing_reference', { target_session_id: sessionId, target_reference_path: referencePath })
+  if (error) throw error
+  return data as DrawingRound
+}
+
+export async function startDrawingRound(sessionId: string, durationSeconds: number, subject: string, category: string, referencePath: string | null): Promise<DrawingRound> {
+  const { supabase } = await import('./supabase.ts')
+  if (!supabase) throw new Error('Supabase is not configured.')
+  const { data, error } = await supabase.rpc('start_drawing_round', { target_session_id: sessionId, target_duration_seconds: durationSeconds, target_subject: subject, target_category: category, target_reference_path: referencePath })
+  if (error) throw error
+  return data as DrawingRound
+}
+
+export async function submitDrawing(roundId: string, imagePath: string): Promise<{ submitted: true; revealed: boolean; submission_count: number }> {
+  const { supabase } = await import('./supabase.ts')
+  if (!supabase) throw new Error('Supabase is not configured.')
+  const { data, error } = await supabase.rpc('submit_drawing', { target_round_id: roundId, target_image_path: imagePath })
+  if (error) throw error
+  return data
+}
+
+export async function expireDrawingRound(roundId: string): Promise<boolean> {
+  const { supabase } = await import('./supabase.ts')
+  if (!supabase) throw new Error('Supabase is not configured.')
+  const { data, error } = await supabase.rpc('expire_drawing_round', { target_round_id: roundId })
+  if (error) throw error
+  return data as boolean
+}
 
 export function latestGameSession(current: GameSession, incoming: GameSession): GameSession {
   return incoming.revision >= current.revision ? incoming : current
+}
+
+export function shouldKeepGameSessionOpen(latest: GameSession, currentlyOpenSessionId: string | null, dismissedSessionId: string | null = null): boolean {
+  return latest.id !== dismissedSessionId && (latest.status === 'active' || latest.id === currentlyOpenSessionId)
 }
 
 export function ticTacToeMoveRpcPayload(sessionId: string, revision: number, cell: number) {

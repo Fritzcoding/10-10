@@ -1,6 +1,6 @@
 # Shared Playground: Audit and Implementation Roadmap
 
-**Status:** Stages 0–4 are implemented and locally verified. Stage 4 passed two-account browser privacy/reveal flows and mobile viewport inspection; its migration remains local and has not been deployed to hosted Supabase.
+**Status:** Stages 0–6 are implemented and locally verified. Stage 7 drawing and images work in local two-account checks, including private submission/reveal; physical Android touch and reference-image upload remain unverified. No Stage 4–7 migrations were deployed to hosted Supabase.
 
 ## Goal
 
@@ -141,27 +141,28 @@ Each stage is a separate implementation/review cycle. Finish and verify one stag
 - [x] **Exit:** Each game has pure rule tests and a two-account privacy/reveal flow.
 - [x] Local verification: 88 Node tests, 103 pgTAP checks, lint, TypeScript, production build, and diff check pass. Two authenticated local browser accounts exercised all four games; screenshots and mobile viewport/console checks were inspected. No hosted Stage 4 migration was applied.
 
-### Stage 5 — Tiny games and Bored Mode
+### Stage 5 — Tiny games and play modes
 
-- [x] Add Memory Match, Rock Paper Scissors, and Word Chain as local-first, phone-friendly games.
-- [x] Recommend by available time, partner availability, and device-local recent play; explain each suggestion.
-- [x] Keep recent games out of recommendations when fresh fitting alternatives exist; use recent fits when no fresh option exists.
-- [x] **Exit:** Recommendations are explainable and avoid repeatedly suggesting recently played games when alternatives fit.
-- Verification: 99 Node tests, lint, TypeScript, production build, and `git diff --check` pass. The 384×832 browser preview confirmed Memory Match, Bored Mode, and no horizontal overflow; console overlay reported no errors. Authenticated multiplayer checks were unnecessary for these local-first screens; local Supabase was unavailable. No migration or hosted change was made.
+- [x] Add Memory Match, Rock Paper Scissors, and Word Chain with solo, bot, and partner/friend modes.
+- [x] Order the partner before online and offline confirmed friends.
+- [x] Use couple/friend authorization, server-validated actions, private Memory Match deck state and RPS choices, and Realtime updates.
+- [x] Remove Bored Mode and its device-local recommendation history.
+- [x] **Exit:** Two-account partner flows, local solo/bot turns, pure rules, and local authorization checks passed.
+- Verification: 125 Node tests and 207 local pgTAP checks pass with lint, TypeScript, build, and diff check. Local two-account browser checks covered partner requests, shared Memory Match reveals, hidden RPS choices/reveal, Word Chain turn handoff, mode selection, and partner ordering. Mobile screenshots were inspected at 384×832 CSS pixels. Migrations remain local.
 
 ### Stage 6 — Shared relationship layer
 
-- [ ] Daily question with hidden independent answers and reveal after both respond.
-- [ ] Simple shared bucket list with completion.
-- [ ] Manually entered inside-joke collection.
-- [ ] Timeline showing selected completed games and shared milestones.
-- **Exit:** All records are couple-scoped by RLS and usable by both accounts.
+- [x] Daily question with hidden independent answers and reveal after both respond.
+- [x] Simple shared bucket list with completion.
+- [x] Manually entered inside-joke collection.
+- [x] Timeline showing selected completed games and shared milestones.
+- [x] **Exit:** All records are couple-scoped by RLS and usable by both accounts.
 
 ### Stage 7 — Drawing and images
 
-- [ ] Canvas drawing, presets (15s, 30s, 1m, 3m, 5m), practical custom time, submit/reveal/compare.
-- [ ] Add optional reference image and photo/file upload to private storage; allow drawing over image if the chosen canvas implementation supports it cleanly.
-- **Exit:** Touch drawing and authorized image access work on Android Chrome; submissions remain hidden until reveal.
+- [x] Canvas drawing, presets (15s, 30s, 1m, 3m, 5m), practical custom time, submit/reveal/compare.
+- [x] Optional reference-image storage and couple-scoped upload policies are implemented; subject/topic prompts can be selected or entered without a reference.
+- [ ] **Exit:** Physical Android touch drawing and reference-image upload/access remain to be verified on-device; browser keyboard drawing and two-account privacy/reveal passed locally.
 
 ### Stage 8 — Surprise delivery
 

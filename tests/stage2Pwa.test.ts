@@ -27,10 +27,10 @@ test('PWA update worker retains push handling and caches only the static shell',
   assert.doesNotMatch(main, /serviceWorker\.register/)
 })
 
-test('mobile shell opts into safe areas and keeps the four tabs usable', () => {
+test('mobile shell opts into safe areas and keeps the five tabs usable', () => {
   assert.match(html, /viewport-fit=cover/)
   assert.match(html, /interactive-widget=resizes-content/)
-  assert.match(hubCss, /grid-template-columns:\s*repeat\(4,/)
+  assert.match(hubCss, /grid-template-columns:\s*repeat\(5,/)
   assert.match(hubCss, /safe-area-inset-bottom/)
   assert.match(baseCss, /font-size:\s*16px/)
 })

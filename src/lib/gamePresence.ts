@@ -19,6 +19,16 @@ export function groupFriendsByPresence(friends: FriendProfile[], onlineUserIds: 
   }
 }
 
+export function orderGameRecipients(friends: readonly FriendProfile[], partnerId: string | null, onlineUserIds: ReadonlySet<string>): FriendProfile[] {
+  const unique = [...new Map(friends.map((friend) => [friend.id, friend])).values()]
+  const partner = unique.find(({ id }) => id === partnerId)
+  return [
+    ...(partner ? [partner] : []),
+    ...unique.filter(({ id }) => id !== partnerId && onlineUserIds.has(id)),
+    ...unique.filter(({ id }) => id !== partnerId && !onlineUserIds.has(id)),
+  ]
+}
+
 export function onlineFriendNames(friends: FriendProfile[], onlineUserIds: ReadonlySet<string>): string[] {
   return friends.filter((friend) => onlineUserIds.has(friend.id)).map((friend) => friend.display_name)
 }

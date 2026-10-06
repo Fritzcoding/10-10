@@ -1,7 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
-import { applyRemoteMove, isSessionForUser, latestGameSession, ticTacToeMoveRpcPayload, type GameSession } from '../src/lib/gameSessions.ts'
+import { applyRemoteMove, isSessionForUser, latestGameSession, shouldKeepGameSessionOpen, ticTacToeMoveRpcPayload, type GameSession } from '../src/lib/gameSessions.ts'
 
 const session = (overrides: Partial<GameSession> = {}): GameSession => ({ id: 's1', game_type: 'tic-tac-toe', player_x_id: 'x-user', player_o_id: 'o-user', board: [null, null, null, null, null, null, null, null, null], turn: 'X', status: 'active', winner: null, revision: 0, deadline_at: null, ...overrides })
 
@@ -39,6 +39,15 @@ test('keeps a newer realtime board when an older refetch or RPC response arrives
   assert.equal(latestGameSession(stale, latest), latest)
 })
 
+test('keeps a just-completed game visible without reopening older completed sessions', () => {
+  const active = session({ game_type: 'draw-together' })
+  const completed = { ...active, status: 'completed' as const }
+  assert.equal(shouldKeepGameSessionOpen(active, null), true)
+  assert.equal(shouldKeepGameSessionOpen(active, null, active.id), false)
+  assert.equal(shouldKeepGameSessionOpen(completed, completed.id), true)
+  assert.equal(shouldKeepGameSessionOpen(completed, null), false)
+})
+
 test('Tic-Tac-Toe move logic rejects sessions belonging to a different game', () => {
   assert.throws(() => applyRemoteMove(session({ game_type: 'would-you-rather' }), 'x-user', 0), /does not support/)
 })
@@ -70,5 +79,5 @@ test('leaving a remote game clears the Hub-owned session so the games directory 
   const games = readFileSync(new URL('../src/components/Games.tsx', import.meta.url), 'utf8')
   const hub = readFileSync(new URL('../src/components/Hub.tsx', import.meta.url), 'utf8')
   assert.match(games, /onSessionExit/)
-  assert.match(hub, /onSessionExit=\{\(\) => setActiveSession\(null\)\}/)
+  assert.match(hub, /dismissedSessionId\.current = activeSession\?\.id \?\? null; setActiveSession\(null\)/)
 })

@@ -1,0 +1,16 @@
+.drawing-game { max-width: 760px; margin: 0 auto; padding: 1rem; color: #26344f; }
+.drawing-game h2 { margin: .25rem 0 1rem; font-size: clamp(1.6rem, 6vw, 2.2rem); }
+.drawing-game__eyebrow { margin: .75rem 0 0; color: #6c7d9d; font-size: .85rem; }
+.drawing-game__setup { display: grid; gap: 1rem; }
+.drawing-game__setup label { display: grid; gap: .4rem; font-weight: 600; }
+.drawing-game select, .drawing-game input, .drawing-game button { min-height: 44px; border: 1px solid #cbd6ec; border-radius: 12px; padding: .65rem .8rem; background: white; color: inherit; font: inherit; }
+.drawing-game button { cursor: pointer; }
+.drawing-game button:disabled { opacity: .6; cursor: wait; }
+.drawing-game__timer { text-align: center; font-size: 1.4rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.drawing-game__prompt { display: grid; gap: .25rem; margin: .75rem 0; padding: 1rem; border-radius: 14px; background: #edf3ff; }
+.drawing-game__prompt span { color: #5d6f91; font-size: .9rem; }
+.drawing-game canvas { display: block; width: 100%; height: auto; min-height: 220px; aspect-ratio: 3 / 2; border: 2px solid #bac8e3; border-radius: 14px; background: white; touch-action: none; }
+.drawing-game__reference, .drawing-game__reveal img { display: block; max-width: 100%; max-height: 55vh; object-fit: contain; border-radius: 12px; }
+.drawing-game__reveal { display: grid; gap: .75rem; }
+.drawing-game__reveal figure { margin: 0; }
+.drawing-game__reveal figcaption, .drawing-game figure figcaption { margin: .35rem 0; color: #5d6f91; font-size: .9rem; }

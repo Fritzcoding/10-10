@@ -20,16 +20,3 @@
 .games-friend-row button { padding: 8px 11px; border: 0; border-radius: 999px; color: #4a254c; background: #ffe0cf; font: inherit; font-size: 11px; cursor: pointer; }
 .games-friend-row button:disabled { color: rgba(255, 247, 241, .72); background: rgba(255, 255, 255, .14); cursor: default; }
 .games-message { margin: 4px 0 0; color: #ffe0cf; font-size: 13px; }
-.bored-mode { display: grid; gap: 12px; padding: 16px; border: 1px solid rgba(255,255,255,.28); border-radius: 20px; background: rgba(255,255,255,.12); }
-.bored-mode__heading { display: flex; align-items: end; justify-content: space-between; gap: 12px; }
-.bored-mode__heading h3 { margin: 0; color: #fffaf7; font-family: Georgia, 'Times New Roman', serif; font-size: 22px; font-weight: 400; }
-.bored-mode__heading label { display: grid; gap: 4px; color: rgba(255,247,241,.75); font-size: 11px; }
-.bored-mode__heading select { max-width: 126px; min-height: 40px; padding: 0 8px; border: 1px solid rgba(255,255,255,.3); border-radius: 10px; color: #fffaf7; background: #71526e; font: inherit; font-size: 12px; }
-.bored-mode__availability { margin: 0; color: rgba(255,247,241,.7); font-size: 12px; }
-.bored-mode__picks { display: grid; gap: 8px; }
-.bored-mode__picks > p { margin: 0; color: rgba(255,247,241,.78); font-size: 13px; }
-.bored-mode__pick { display: grid; gap: 5px; width: 100%; padding: 11px 12px; border: 1px solid rgba(255,255,255,.22); border-radius: 14px; color: #fffaf7; background: rgba(255,255,255,.1); text-align: left; font: inherit; cursor: pointer; }
-.bored-mode__pick > span:first-child { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.bored-mode__pick small, .bored-mode__pick > span:last-child { color: rgba(255,247,241,.72); font-size: 11px; line-height: 1.4; }
-.bored-mode__pick:hover, .bored-mode__pick:focus-visible { background: rgba(255,255,255,.2); }
-.bored-mode__pick:focus-visible, .bored-mode__heading select:focus-visible { outline: 2px solid #ffe0cf; outline-offset: 2px; }

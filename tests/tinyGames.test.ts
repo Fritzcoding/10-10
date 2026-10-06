@@ -1,12 +1,11 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
+import * as tinyGameRules from '../src/lib/tinyGames.ts'
 import {
   createMemoryGame,
   flipMemoryCard,
   getRockPaperScissorsOutcome,
   submitWordChainWord,
-  recommendGames,
-  readGameHistory,
 } from '../src/lib/tinyGames.ts'
 
 test('memory match flips valid cards, tracks a pair and ignores duplicate selections', () => {
@@ -58,48 +57,37 @@ test('word chain trims words and rejects a wrong first letter or duplicate', () 
   assert.equal(submitWordChainWord(['cloud', 'dawn'], 'CLOUD'), null)
 })
 
-const games = [
-  { id: 'local', label: 'Local', durationMinutes: 5, availability: 'local' as const },
-  { id: 'partner', label: 'Partner', durationMinutes: 5, availability: 'partner' as const },
-  { id: 'long', label: 'Long', durationMinutes: 10, availability: 'local' as const },
-]
-
-test('recommendations fit the time window and require an online partner when needed', () => {
-  const offline = recommendGames(games, { availableMinutes: 5, partnerOnline: false, recent: {} })
-  assert.deepEqual(offline.map(({ id }) => id), ['local'])
-  assert.match(offline[0].reason, /5-minute/)
-
-  const online = recommendGames(games, { availableMinutes: 5, partnerOnline: true, recent: {} })
-  assert.deepEqual(online.map(({ id }) => id), ['partner', 'local'])
-  assert.match(online[0].reason, /partner is online/i)
+test('memory bot uses a known pair before choosing randomly', () => {
+  assert.equal(typeof tinyGameRules.chooseMemoryBotFlip, 'function')
+  if (typeof tinyGameRules.chooseMemoryBotFlip !== 'function') return
+  const game = { cards: [{ id: 0, pair: 'a' }, { id: 1, pair: 'a' }, { id: 2, pair: 'b' }], revealed: [], matched: [] }
+  assert.equal(tinyGameRules.chooseMemoryBotFlip(game, new Map([[0, 'a'], [1, 'a']]), () => 0.99), 0)
 })
 
-test('recommendations skip recently played games when another fit is available', () => {
-  const picks = recommendGames(games, {
-    availableMinutes: 5,
-    partnerOnline: true,
-    recent: { partner: Date.now() },
-  })
-  assert.equal(picks.some(({ id }) => id === 'partner'), false)
-  assert.equal(picks.some(({ id }) => id === 'local'), true)
+test('memory bot does not inspect unseen card pairs', () => {
+  assert.equal(typeof tinyGameRules.chooseMemoryBotFlip, 'function')
+  if (typeof tinyGameRules.chooseMemoryBotFlip !== 'function') return
+  const game = { cards: [{ id: 0, pair: 'a' }, { id: 1, pair: 'a' }, { id: 2, pair: 'b' }], revealed: [], matched: [] }
+  assert.equal(tinyGameRules.chooseMemoryBotFlip(game, new Map([[0, 'a']]), () => 0.99), 2)
 })
 
-test('recommendations reuse recent games when no fresh game fits', () => {
-  const picks = recommendGames([games[0]], {
-    availableMinutes: 5,
-    partnerOnline: false,
-    recent: { local: Date.now() },
-  })
-  assert.deepEqual(picks.map(({ id }) => id), ['local'])
-  assert.match(picks[0].reason, /only fit/i)
+test('memory bot never selects a matched card', () => {
+  assert.equal(typeof tinyGameRules.chooseMemoryBotFlip, 'function')
+  if (typeof tinyGameRules.chooseMemoryBotFlip !== 'function') return
+  const game = { cards: [{ id: 0, pair: 'a' }, { id: 1, pair: 'a' }, { id: 2, pair: 'b' }], revealed: [], matched: [0, 1] }
+  assert.equal(tinyGameRules.chooseMemoryBotFlip(game, new Map(), () => 0), 2)
 })
 
-test('recommendations return no result when nothing fits the time or availability', () => {
-  assert.deepEqual(recommendGames(games, { availableMinutes: 1, partnerOnline: false, recent: {} }), [])
-  assert.deepEqual(recommendGames([games[1]], { availableMinutes: 5, partnerOnline: false, recent: {} }), [])
+test('word chain bot returns an unused legal word', () => {
+  assert.equal(typeof tinyGameRules.chooseWordChainBotWord, 'function')
+  if (typeof tinyGameRules.chooseWordChainBotWord !== 'function') return
+  const word = tinyGameRules.chooseWordChainBotWord(['cloud'], () => 0)
+  assert.ok(word)
+  assert.equal(submitWordChainWord(['cloud'], word)?.at(-1), word)
 })
 
-test('local history safely ignores malformed values and retains valid timestamps', () => {
-  assert.deepEqual(readGameHistory('{bad json'), {})
-  assert.deepEqual(readGameHistory('{"local":123,"bad":"yesterday","negative":-1}'), { local: 123 })
+test('word chain bot returns null when no legal word exists', () => {
+  assert.equal(typeof tinyGameRules.chooseWordChainBotWord, 'function')
+  if (typeof tinyGameRules.chooseWordChainBotWord !== 'function') return
+  assert.equal(tinyGameRules.chooseWordChainBotWord(['cloud', 'dawn', 'night', 'tree', 'earth', 'home', 'eagle', 'egg', 'garden', 'nest']), null)
 })

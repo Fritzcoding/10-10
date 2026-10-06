@@ -52,15 +52,26 @@
 - 6.2: `Stage 6.2: Add Tic-Tac-Toe game board UI`
 - 6.3: `Stage 6.3: Add Supabase realtime game synchronization`
 
-## Shared Playground Stage 5: Tiny Games and Bored Mode
+## Shared Playground Stage 5: Tiny games and play modes
 
-- [x] Added Memory Match, Rock Paper Scissors, and Word Chain as local pass-and-play games.
-- [x] Bored Mode filters by available time and partner presence, accounts for per-user device-local recency, and explains recommendations.
-- [x] Verified at 384×832 CSS pixels with no horizontal overflow; the preview console showed no errors.
-- [x] Verification: 99 Node tests, lint, `npx tsc --noEmit`, production build, and `git diff --check` pass.
-- Authenticated two-account checks were not needed for these local-only game flows. Local Supabase was unavailable; no migration was deployed.
+- [x] Memory Match, Rock Paper Scissors, and Word Chain support solo, bot, and partner/friend play; partner is first in the people picker.
+- [x] Bored Mode and its device-local recommendation history were removed.
+- [x] Friend/partner sessions use server-validated RPCs, private memory decks and RPS choices, revision checks, and couple/friend authorization.
+- [x] Local two-account browser checks covered partner requests, Memory Match shared reveals, hidden RPS choice and reveal, Word Chain turn handoff, solo play, bot turns, and partner-first ordering. Mobile screenshots were inspected at 384×832 CSS pixels.
+- [x] Regression fixes keep a completed game visible until exit and prevent an exited active session from reopening over the directory.
+- [x] Verification: 125 Node tests, lint, `npx tsc --noEmit`, production build, `npx supabase test db --local` (207 checks), and `git diff --check` pass.
+- [x] No new package was installed. Migrations are local only; hosted Supabase was not changed. Temporary browser users/data were removed by resetting the authorized local database after verification.
 
-Stage 5 commit message: `Stage 5: Add tiny games and Bored Mode`
+Stage 5 follow-up commit message: `Stage 5: Connect tiny games, add profile avatars and drawing prompts`
+
+## Profile avatars and drawing prompts follow-up
+
+- [x] Profile accepts private JPEG/PNG/WebP avatars up to 5 MiB and preserves legacy HTTP(S) avatar URLs. Browser verification selected and saved a local PNG; pgTAP covers bucket privacy, ownership, and relationship reads.
+- [x] Draw Together includes the supplied 150 subject/topic pairs, custom subject/topic entry, shared saved prompts, and database length/authorization checks.
+- [x] Two-account browser verification confirmed both preset and custom prompts reach the partner, and drawing submissions remain private until both accounts submit. No reference image was needed for the prompt flow.
+- [x] Final verification: 125 Node tests, lint, TypeScript, build, 207 local pgTAP checks, and diff check pass. The build retains existing large-chunk and ineffective dynamic-import warnings.
+- A transient React Fast Refresh warning appeared in both open browser tabs when the Hub effect dependency list changed during implementation. Final page reloads produced no new warning.
+- The Chrome extension file chooser requires enabling “Allow access to file URLs”; avatar selection and save succeeded in the Codex in-app browser. Physical Android touchscreen testing and browser upload of all avatar formats/size boundaries remain unverified.
 
 - [x] 2.2 - Audio Player & Unmute Logic
 - [x] 3.1 - Auth Modal UI

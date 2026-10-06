@@ -1,23 +1,24 @@
-.tiny-game { display: grid; gap: 16px; color: #fffaf7; }
+.tiny-game { display: grid; gap: 16px; color: #26344f; }
 .tiny-game__header { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
-.tiny-game h2 { margin: 0; color: #fffaf7; font-family: Georgia, 'Times New Roman', serif; font-size: clamp(26px, 7vw, 34px); font-weight: 400; letter-spacing: -0.04em; line-height: 1.1; }
-.tiny-game__quiet-button { min-height: 42px; padding: 8px 12px; border: 1px solid rgba(255,255,255,.28); border-radius: 999px; color: #fffaf7; background: rgba(255,255,255,.12); font: inherit; font-size: 12px; cursor: pointer; }
-.tiny-game__status { margin: 0; color: #fffaf7; font-size: 15px; font-weight: 700; text-align: center; }
-.tiny-game__scores { display: flex; justify-content: space-between; gap: 8px; margin: 0; color: rgba(255,247,241,.8); font-size: 12px; }
+.tiny-game h2 { margin: 0; color: #26344f; font-family: Georgia, 'Times New Roman', serif; font-size: clamp(26px, 7vw, 34px); font-weight: 400; letter-spacing: -0.04em; line-height: 1.1; }
+.tiny-game__quiet-button { min-height: 42px; padding: 8px 12px; border: 1px solid #cbd6ec; border-radius: 999px; color: #405b94; background: #fff; font: inherit; font-size: 12px; cursor: pointer; }
+.tiny-game__status { margin: 0; color: #26344f; font-size: 15px; font-weight: 700; text-align: center; }
+.tiny-game__scores { display: flex; justify-content: space-between; gap: 8px; margin: 0; color: #526584; font-size: 12px; }
 .memory-board { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
-.memory-card { display: grid; place-items: center; aspect-ratio: 1; min-width: 0; border: 1px solid rgba(255,255,255,.28); border-radius: 14px; color: #fffaf7; background: rgba(255,255,255,.13); font-size: clamp(24px, 8vw, 38px); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.memory-card { display: grid; place-items: center; aspect-ratio: 1; min-width: 0; border: 1px solid #cbd6ec; border-radius: 14px; color: #526584; background: #fff; font-size: clamp(24px, 8vw, 38px); cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .memory-card--shown { color: #523957; background: rgba(255,225,209,.9); }
 .memory-card:disabled { cursor: default; }
-.tiny-game button:focus-visible, .tiny-game input:focus-visible { outline: 2px solid #ffe0cf; outline-offset: 2px; }
+.tiny-game button:focus-visible, .tiny-game input:focus-visible { outline: 2px solid #405b94; outline-offset: 2px; }
 .rps-choices { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 .rps-choices button, .word-chain__form button { min-height: 48px; border: 1px solid rgba(255,255,255,.28); border-radius: 14px; color: #4a254c; background: #ffe0cf; font: inherit; font-weight: 700; cursor: pointer; }
 .rps-reveal { margin: 4px 0; font-family: Georgia, 'Times New Roman', serif; font-size: clamp(22px, 6vw, 30px); text-align: center; text-transform: capitalize; }
-.rps-reveal span { color: rgba(255,247,241,.55); }
+.rps-reveal span { color: #526584; }
 .word-chain { display: flex; flex-wrap: wrap; gap: 8px; min-height: 48px; align-content: start; }
-.word-chain__word { padding: 9px 12px; border: 1px solid rgba(255,255,255,.22); border-radius: 999px; background: rgba(255,255,255,.14); }
+.word-chain__word { padding: 9px 12px; border: 1px solid #cbd6ec; border-radius: 999px; background: #fff; }
 .word-chain__form { display: grid; gap: 8px; }
 .word-chain__form label { font-size: 13px; }
 .word-chain__form > div { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; }
-.word-chain__form input { min-width: 0; min-height: 48px; box-sizing: border-box; padding: 0 12px; border: 1px solid rgba(255,255,255,.3); border-radius: 12px; color: #fffaf7; background: rgba(255,255,255,.13); font: inherit; }
+.word-chain__form input { min-width: 0; min-height: 48px; box-sizing: border-box; padding: 0 12px; border: 1px solid #cbd6ec; border-radius: 12px; color: #26344f; background: #fff; font: inherit; }
 .word-chain__form button { padding: 0 14px; }
-.tiny-game__error { margin: 0; color: #ffe0cf; font-size: 12px; }
+.word-chain__form button:disabled, .rps-choices button:disabled { opacity: .55; cursor: default; }
+.tiny-game__error { margin: 0; color: #9b3640; font-size: 12px; }

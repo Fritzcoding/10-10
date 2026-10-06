@@ -8,9 +8,10 @@ import PartnerStatus from './PartnerStatus'
 import Settings from './Settings'
 import GameRequestBanner from './GameRequestBanner'
 import Profile from './Profile'
+import Us from './Us'
 import './Hub.css'
 import './HubTheme.css'
-import { isSessionForUser, type GameSession } from '../lib/gameSessions'
+import { isSessionForUser, shouldKeepGameSessionOpen, type GameSession } from '../lib/gameSessions'
 import { useGamePresence } from '../lib/gamePresence'
 import { formatProfileUid } from '../lib/friendSearch'
 
@@ -21,10 +22,12 @@ function Hub({ onLogout }: HubProps) {
   const [userId, setUserId] = useState<string>()
   const [displayUid, setDisplayUid] = useState<number | null>(null)
   const [activeSession, setActiveSession] = useState<GameSession | null>(null)
+  const dismissedSessionId = useRef<string | null>(null)
   const currentUserId = useRef<string | undefined>(undefined)
   const { onlineUserIds } = useGamePresence(userId)
 
   const openSession = useCallback((session: GameSession) => {
+    if (session.id !== dismissedSessionId.current) dismissedSessionId.current = null
     setActiveSession(session)
     setActiveTab('games')
   }, [])
@@ -65,16 +68,19 @@ function Hub({ onLogout }: HubProps) {
     if (!supabase || !userId) return
     const client = supabase
     const loadActiveSession = async () => {
-      const { data } = await client.from('game_sessions').select('*').or(`player_x_id.eq.${userId},player_o_id.eq.${userId}`).in('game_type', ['tic-tac-toe', 'question-cards', 'whos-more-likely', 'lie-detector', 'describe-without-saying-it']).eq('status', 'active').order('created_at', { ascending: false }).limit(1).maybeSingle()
-      if (data && isSessionForUser(data as GameSession, userId)) openSession(data as GameSession)
+      const { data } = await client.from('game_sessions').select('*').or(`player_x_id.eq.${userId},player_o_id.eq.${userId}`).in('game_type', ['tic-tac-toe', 'question-cards', 'whos-more-likely', 'lie-detector', 'describe-without-saying-it', 'draw-together', 'memory-match', 'rock-paper-scissors', 'word-chain']).in('status', ['active', 'completed']).order('created_at', { ascending: false }).limit(1).maybeSingle()
+      if (!data || !isSessionForUser(data as GameSession, userId)) return
+      const latest = data as GameSession
+      if (shouldKeepGameSessionOpen(latest, activeSession?.id ?? null, dismissedSessionId.current)) openSession(latest)
+      else setActiveSession(null)
     }
     void loadActiveSession()
     const channel = client.channel(`hub-game-sessions-${userId}`).on('postgres_changes', { event: '*', schema: 'public', table: 'game_sessions' }, () => void loadActiveSession()).subscribe((status) => { if (status === 'SUBSCRIBED') void loadActiveSession() })
     return () => { void client.removeChannel(channel) }
-  }, [openSession, userId])
+  }, [activeSession?.id, openSession, userId])
 
   const loadSession = useCallback(async (sessionId: string) => {
-    const { data } = await supabase?.from('game_sessions').select('*').eq('id', sessionId).in('game_type', ['tic-tac-toe', 'question-cards', 'whos-more-likely', 'lie-detector', 'describe-without-saying-it']).single() ?? { data: null }
+    const { data } = await supabase?.from('game_sessions').select('*').eq('id', sessionId).in('game_type', ['tic-tac-toe', 'question-cards', 'whos-more-likely', 'lie-detector', 'describe-without-saying-it', 'draw-together', 'memory-match', 'rock-paper-scissors', 'word-chain']).single() ?? { data: null }
     if (data) openSession(data as GameSession)
   }, [openSession])
 
@@ -93,7 +99,8 @@ function Hub({ onLogout }: HubProps) {
         {activeTab === 'friends' && <Friends />}
         {activeTab === 'profile' && <Profile />}
         {activeTab === 'settings' && <Settings onLogout={onLogout} />}
-        {activeTab === 'games' && <Games key={userId ?? 'guest'} userId={userId} onlineUserIds={onlineUserIds} activeSession={activeSession} onSessionExit={() => setActiveSession(null)} />}
+        {activeTab === 'games' && <Games key={userId ?? 'guest'} userId={userId} onlineUserIds={onlineUserIds} activeSession={activeSession} onSessionExit={() => { dismissedSessionId.current = activeSession?.id ?? null; setActiveSession(null) }} />}
+        {activeTab === 'us' && <Us userId={userId} />}
       </section>
       <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
     </main>

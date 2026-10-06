@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react'
 import { applyMove, chooseBotMove, createInitialGameState, getGameOutcome, type GameState, type Mark } from '../../lib/ticTacToe'
 import './TicTacToe.css'
 
-export type TicTacToeMode = 'bot' | 'local' | 'remote'
+export type TicTacToeMode = 'bot' | 'solo' | 'remote'
 type TicTacToeProps = { mode?: TicTacToeMode; remoteState?: GameState; playerMark?: Mark; onMove?: (index: number) => void }
 
-function TicTacToe({ mode = 'local', remoteState, playerMark: requestedPlayerMark, onMove }: TicTacToeProps) {
+function TicTacToe({ mode = 'solo', remoteState, playerMark: requestedPlayerMark, onMove }: TicTacToeProps) {
   const [game, setGame] = useState<GameState>(createInitialGameState)
   const displayedGame = mode === 'remote' && remoteState ? remoteState : game
   const { winner, draw: isDraw } = getGameOutcome(displayedGame.board)
@@ -21,7 +21,7 @@ function TicTacToe({ mode = 'local', remoteState, playerMark: requestedPlayerMar
   }, [displayedGame, isDraw, mode, winner])
 
   const handleCellClick = (index: number) => {
-    if (winner || isDraw || displayedGame.turn !== effectivePlayerMark || displayedGame.board[index]) return
+    if (winner || isDraw || (mode !== 'solo' && displayedGame.turn !== effectivePlayerMark) || displayedGame.board[index]) return
     if (mode === 'remote') {
       onMove?.(index)
       return
@@ -41,8 +41,8 @@ function TicTacToe({ mode = 'local', remoteState, playerMark: requestedPlayerMar
         {mode !== 'remote' && <button className="tic-tac-toe__reset" type="button" onClick={resetGame}>Reset Game</button>}
       </header>
       <div className="tic-tac-toe__status" aria-live="polite">
-        {winner ? `${winner} wins!` : isDraw ? 'It’s a draw.' : `${displayedGame.turn}'s turn`}
-        <span>You are {effectivePlayerMark}</span>
+        {winner ? `${winner} wins!` : isDraw ? 'It’s a draw.' : mode === 'solo' ? `Player ${displayedGame.turn}’s turn · you control both` : `${displayedGame.turn}'s turn`}
+        {mode !== 'solo' && <span>You are {effectivePlayerMark}</span>}
       </div>
       <div className="tic-tac-toe__board" role="grid" aria-label="Tic-Tac-Toe board">
         {displayedGame.board.map((cell, index) => (
@@ -52,7 +52,7 @@ function TicTacToe({ mode = 'local', remoteState, playerMark: requestedPlayerMar
             type="button"
             role="gridcell"
             aria-label={cell ? `Cell ${index + 1}: ${cell}` : `Cell ${index + 1}: empty`}
-            disabled={Boolean(cell) || Boolean(winner) || Boolean(isDraw) || displayedGame.turn !== effectivePlayerMark}
+            disabled={Boolean(cell) || Boolean(winner) || Boolean(isDraw) || (mode === 'bot' && displayedGame.turn !== 'X') || (mode === 'remote' && displayedGame.turn !== effectivePlayerMark)}
             onClick={() => handleCellClick(index)}
           >
             {cell}
