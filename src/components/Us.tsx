@@ -3,11 +3,14 @@ import { supabase } from '../lib/supabase'
 import { formatSupabaseDataError } from '../lib/supabaseErrors'
 import { DAILY_QUESTIONS, validateDailyAnswer, visibleTimelineEvents, type TimelineEvent } from '../lib/relationshipLayer'
 import './Us.css'
+import Milestones from './Milestones'
+import { filterWishlistItems, validateWishlistItem, WISHLIST_CATEGORIES, type WishlistCategory } from '../lib/wishlists'
+import SharedCalendar from './SharedCalendar'
 
 type UsProps = { userId?: string }
 type DailyQuestion = { id: string; local_date: string; prompt: string }
 type DailyAnswer = { user_id: string; answer: string }
-type BucketItem = { id: string; title: string; completed: boolean }
+type BucketItem = { id: string; title: string; completed: boolean; category: WishlistCategory; note: string; link: string; saved: boolean }
 type InsideJoke = { id: string; text: string }
 type UsTimelineEvent = TimelineEvent & { summary: string }
 
@@ -21,12 +24,20 @@ function Us({ userId }: UsProps) {
   const [timeline, setTimeline] = useState<UsTimelineEvent[]>([])
   const [answer, setAnswer] = useState('')
   const [newBucket, setNewBucket] = useState('')
+  const [newBucketCategory, setNewBucketCategory] = useState('date')
+  const [newBucketNote, setNewBucketNote] = useState('')
+  const [newBucketLink, setNewBucketLink] = useState('')
+  const [bucketFilter, setBucketFilter] = useState('all')
   const [newJoke, setNewJoke] = useState('')
   const [editing, setEditing] = useState<string | null>(null)
   const [editingJoke, setEditingJoke] = useState<string | null>(null)
   const [editText, setEditText] = useState('')
+  const [editBucketCategory, setEditBucketCategory] = useState('date')
+  const [editBucketNote, setEditBucketNote] = useState('')
+  const [editBucketLink, setEditBucketLink] = useState('')
   const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(true)
+  const visibleBucket = filterWishlistItems(bucket, { category: bucketFilter })
 
   const refresh = useCallback(async () => {
     if (!supabase || !userId) { setLoading(false); return }
@@ -37,7 +48,7 @@ function Us({ userId }: UsProps) {
     const [couple, daily, list, savedJokes, events] = await Promise.all([
       supabase.from('couples').select('timezone').eq('id', member.couple_id).single(),
       supabase.rpc('get_or_create_daily_question'),
-      supabase.from('bucket_list_items').select('id,title,completed').eq('couple_id', member.couple_id).order('completed').order('created_at', { ascending: false }),
+      supabase.from('bucket_list_items').select('id,title,completed,category,note,link,saved').eq('couple_id', member.couple_id).order('completed').order('created_at', { ascending: false }),
       supabase.from('inside_jokes').select('id,text').eq('couple_id', member.couple_id).order('created_at', { ascending: false }),
       supabase.from('relationship_timeline').select('id,pinned,hidden,created_at,summary').eq('couple_id', member.couple_id).order('created_at', { ascending: false }),
     ])
@@ -93,13 +104,14 @@ function Us({ userId }: UsProps) {
 
   const addBucket = (event: FormEvent) => {
     event.preventDefault()
-    const title = newBucket.trim()
-    if (!title || !coupleId) return
-    if (title.length > 160) { setMessage('Keep bucket-list ideas under 160 characters.'); return }
+    if (!coupleId) return
+    let item: ReturnType<typeof validateWishlistItem>
+    try { item = validateWishlistItem(newBucket, newBucketNote, newBucketLink, newBucketCategory) }
+    catch (error) { setMessage((error as Error).message); return }
     void run(async () => {
-      const { error } = await supabase!.from('bucket_list_items').insert({ couple_id: coupleId, title })
+      const { error } = await supabase!.from('bucket_list_items').insert({ couple_id: coupleId, ...item })
       if (error) throw error
-      setNewBucket('')
+      setNewBucket(''); setNewBucketNote(''); setNewBucketLink('')
     })
   }
 
@@ -136,14 +148,23 @@ function Us({ userId }: UsProps) {
             : <form className="us-form" onSubmit={submitAnswer}><label htmlFor="daily-answer">Your answer</label><textarea id="daily-answer" maxLength={1000} value={answer} onChange={(event) => setAnswer(event.target.value)} /><button type="submit">Save my answer</button></form>}
       </section>
 
-      <section className="us-section" aria-labelledby="bucket-title"><div className="us-section__heading"><h3 id="bucket-title">Our bucket list</h3><small>{bucket.filter((item) => item.completed).length} of {bucket.length} done</small></div>
-        <form className="us-inline-form" onSubmit={addBucket}><label className="sr-only" htmlFor="new-bucket-item">Add a bucket-list idea</label><input id="new-bucket-item" maxLength={160} placeholder="Something we’d love to do…" value={newBucket} onChange={(event) => setNewBucket(event.target.value)} /><button type="submit">Add</button></form>
-        <ul className="us-list">{bucket.map((item) => <li key={item.id} className={item.completed ? 'is-complete' : ''}>
-          <input type="checkbox" aria-label={`Mark ${item.title} ${item.completed ? 'not done' : 'done'}`} checked={item.completed} onChange={() => void run(async () => { const { error } = await supabase!.from('bucket_list_items').update({ completed: !item.completed }).eq('id', item.id); if (error) throw error })} />
-          {editing === item.id ? <form className="us-edit-form" onSubmit={(event) => { event.preventDefault(); const title = editText.trim(); if (!title || title.length > 160) { setMessage('Use 1 to 160 characters.'); return } void run(async () => { const { error } = await supabase!.from('bucket_list_items').update({ title }).eq('id', item.id); if (error) throw error; setEditing(null) }) }}><input aria-label="Edit bucket item" maxLength={160} value={editText} onChange={(event) => setEditText(event.target.value)} /><button type="submit">Save</button></form>
-            : <><span>{item.title}</span><button className="us-text-button" type="button" onClick={() => { setEditing(item.id); setEditText(item.title) }}>Edit</button><button className="us-text-button" type="button" onClick={() => void run(async () => { const { error } = await supabase!.from('bucket_list_items').delete().eq('id', item.id); if (error) throw error })}>Remove</button></>}
+      <Milestones coupleId={coupleId} timezone={timezone} />
+      <SharedCalendar coupleId={coupleId} timezone={timezone} />
+
+      <section className="us-section" aria-labelledby="bucket-title"><div className="us-section__heading"><h3 id="bucket-title">Our wishlists</h3><small>{bucket.filter((item) => item.completed).length} of {bucket.length} done</small></div>
+        <form className="us-form" onSubmit={addBucket}>
+          <label htmlFor="new-bucket-item">Idea</label><input id="new-bucket-item" maxLength={160} placeholder="Something we’d love to do…" value={newBucket} onChange={(event) => setNewBucket(event.target.value)} />
+          <label htmlFor="new-bucket-category">Category</label><select id="new-bucket-category" value={newBucketCategory} onChange={(event) => setNewBucketCategory(event.target.value)}>{WISHLIST_CATEGORIES.map((value) => <option key={value} value={value}>{value[0].toUpperCase() + value.slice(1)}</option>)}</select>
+          <label htmlFor="new-bucket-note">Note (optional)</label><textarea id="new-bucket-note" maxLength={1000} value={newBucketNote} onChange={(event) => setNewBucketNote(event.target.value)} />
+          <label htmlFor="new-bucket-link">Link (optional)</label><input id="new-bucket-link" type="url" placeholder="https://…" value={newBucketLink} onChange={(event) => setNewBucketLink(event.target.value)} />
+          <button type="submit">Add to wishlist</button>
+        </form>
+        <label htmlFor="bucket-category-filter">Show category</label><select id="bucket-category-filter" value={bucketFilter} onChange={(event) => setBucketFilter(event.target.value)}><option value="all">All ideas</option>{WISHLIST_CATEGORIES.map((value) => <option key={value} value={value}>{value[0].toUpperCase() + value.slice(1)}</option>)}</select>
+        <ul className="us-list milestone-list">{visibleBucket.map((item) => <li key={item.id} className={item.completed ? 'is-complete' : ''}>
+          {editing === item.id ? <form className="us-form" onSubmit={(event) => { event.preventDefault(); try { const clean = validateWishlistItem(editText, editBucketNote, editBucketLink, editBucketCategory); void run(async () => { const { error } = await supabase!.from('bucket_list_items').update(clean).eq('id', item.id); if (error) throw error; setEditing(null) }) } catch (error) { setMessage((error as Error).message) } }}><label>Edit idea</label><input aria-label="Edit bucket item" maxLength={160} value={editText} onChange={(event) => setEditText(event.target.value)} /><label>Category</label><select aria-label="Edit category" value={editBucketCategory} onChange={(event) => setEditBucketCategory(event.target.value)}>{WISHLIST_CATEGORIES.map((value) => <option key={value} value={value}>{value}</option>)}</select><label>Note</label><textarea aria-label="Edit note" maxLength={1000} value={editBucketNote} onChange={(event) => setEditBucketNote(event.target.value)} /><label>Link</label><input aria-label="Edit link" type="url" value={editBucketLink} onChange={(event) => setEditBucketLink(event.target.value)} /><button type="submit">Save</button></form>
+            : <><label><input type="checkbox" aria-label={`Mark ${item.title} ${item.completed ? 'not done' : 'done'}`} checked={item.completed} onChange={() => void run(async () => { const { error } = await supabase!.from('bucket_list_items').update({ completed: !item.completed }).eq('id', item.id); if (error) throw error })} /> Done</label><span><strong>{item.title}</strong> · {item.category}{item.note && <small><br />{item.note}</small>}{item.link && <small><br /><a href={item.link} target="_blank" rel="noreferrer">Open link</a></small>}</span><div className="milestone-list__actions"><button className="us-text-button" type="button" aria-pressed={item.saved} onClick={() => void run(async () => { const { error } = await supabase!.from('bucket_list_items').update({ saved: !item.saved }).eq('id', item.id); if (error) throw error })}>{item.saved ? 'Saved' : 'Save idea'}</button><button className="us-text-button" type="button" onClick={() => { setEditing(item.id); setEditText(item.title); setEditBucketCategory(item.category); setEditBucketNote(item.note); setEditBucketLink(item.link) }}>Edit</button><button className="us-text-button" type="button" onClick={() => void run(async () => { const { error } = await supabase!.from('bucket_list_items').delete().eq('id', item.id); if (error) throw error })}>Remove</button></div></>}
         </li>)}</ul>
-        {bucket.length === 0 && <p className="us-empty">Add a little adventure to look forward to.</p>}
+        {bucket.length === 0 && <p className="us-empty">Add date ideas, places, food, gifts, and trips to your shared wishlists.</p>}
       </section>
 
       <section className="us-section" aria-labelledby="jokes-title"><h3 id="jokes-title">Inside jokes</h3><form className="us-inline-form" onSubmit={addJoke}><label className="sr-only" htmlFor="new-inside-joke">Save an inside joke</label><input id="new-inside-joke" maxLength={500} placeholder="A phrase only you two understand…" value={newJoke} onChange={(event) => setNewJoke(event.target.value)} /><button type="submit">Save</button></form>

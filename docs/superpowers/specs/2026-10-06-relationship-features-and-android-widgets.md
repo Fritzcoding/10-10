@@ -1,6 +1,6 @@
 # Shared Playground: Relationship Features and Android Widgets
 
-**Status:** Approved design; implementation planning has not started.
+**Status:** Approved design; Stages 8–10 complete locally, Stages 11–17 pending.
 **Date:** 2026-10-06
 **Supersedes:** The future Stage 8 item in `2026-09-30-shared-playground-roadmap.md`. Stages 0–7 remain as recorded there.
 
@@ -8,7 +8,15 @@
 
 Extend the existing couple app with practical shared planning, relationship memories, and dedicated Android home-screen widgets. Preserve the React/Vite app and Supabase foundation. Add only a small native Android layer for app widgets and native capabilities that the web app cannot provide reliably.
 
-The current roadmap records Stages 0–6 as implemented and locally verified. Stage 7's drawing flow, private submissions, and reveal work locally; physical Android touch and reference-image upload/access remain unverified. New stages begin only after the active stage's acceptance checks are complete.
+Stages 0–10 have been implemented and locally verified. Stage 7 mobile browser emulation passed its two-account reference image, touch drawing, private submission, and reveal checks; physical Android device verification remains open. Stages 8–10 passed local database and two-account browser checks. New stages begin only after the active stage's acceptance checks are complete.
+
+## Implementation status (2026-10-07)
+
+- [x] Stage 7 — drawing and images; browser-emulated mobile verification passed. Physical Android checks remain unverified.
+- [x] Stage 8 — key dates and countdowns; local migration and two-account checks passed.
+- [x] Stage 9 — wishlists; existing bucket list extended, local migration and two-account checks passed.
+- [x] Stage 10 — shared calendar and date planning; local migration and two-instance Chrome checks passed.
+- [ ] Stages 11–17 — not started.
 
 ## Approved scope and order
 

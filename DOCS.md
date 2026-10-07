@@ -159,6 +159,47 @@ Debug finding (2026-10-01, before deployment): current client move submission ca
 - Stage 4 migration remains local. It was not deployed to hosted Supabase.
 
 Stage 4 commit message: `Stage 4: Add private conversation games`
+
+## Shared Playground Stage 7: Drawing and Images
+
+- [x] Partner-requested Draw Together flow with timed rounds, shared optional reference image, private drawing submissions, and joint reveal.
+- [x] Local database authorization suite: 28/28 drawing assertions passed. Two-account mobile browser verification confirmed a PNG reference upload and partner access, touch-event drawing, hidden first submission, and reveal after both submit; browser console had no errors.
+- [x] Screenshots were captured and inspected at 384×832 CSS pixels in `docs/verification/stage-7/`.
+- Android emulator Chrome and a physical Galaxy device were not verified. The app flow was exercised with mobile browser emulation; do not treat that as physical-device verification.
+- Stage 7 migration remains local; no hosted migration was deployed.
+
+Stage 7 commit message: `Stage 7: Add private drawing and image rounds`
+
+## Shared Playground Stage 8: Key Dates and Countdowns
+
+- [x] Added couple-scoped milestones for anniversaries, birthdays, trips, visits, and other dates, with annual recurrence, categories, edits, removal, a featured countdown, and in-app 7-day reminders.
+- [x] Annual date and leap-day recurrence, date validation, countdown day math, and upcoming ordering have pure tests.
+- [x] Local pgTAP authorization suite: 15/15 assertions passed, including couple isolation, invalid values, featured countdown RPC permissions, and private Realtime policy presence.
+- [x] Two local authenticated browser accounts created, edited, and removed a milestone; private couple Realtime synced the changes. Mobile layout at 384×832 was inspected, and the browser console had no errors. Screenshot: `docs/verification/stage-8/countdown-mobile.png`.
+- [x] Verification: 130 Node tests, lint, TypeScript, production build, and `git diff --check` pass. Build retains existing chunk-size and ineffective dynamic-import warnings.
+- Stage 8 migration remains local; no hosted migration was deployed.
+
+Stage 8 commit message: `Stage 8: Add shared key dates and countdowns`
+
+## Shared Playground Stage 9: Wishlists
+
+- [x] Extended the existing couple bucket list with date, place, food, gift, and trip categories, notes, optional safe HTTP(S) links, saved and completed states, and category filtering.
+- [x] Local pgTAP suite passed 12 assertions for column constraints, couple sharing/isolation, category validation, and unsafe link rejection.
+- [x] Two local accounts added, edited, saved, completed, and removed wishlist items; changes appeared in the partner view. Inspected 384×832 mobile screenshot: `docs/verification/stage-9/wishlist-mobile.png`; browser console was clear.
+- [x] Verification: 133 Node tests, lint, TypeScript, production build, and `git diff --check` pass. Build retains existing chunk-size and ineffective dynamic-import warnings.
+- Stage 9 migration is local only; no hosted migration was deployed.
+
+Stage 9 commit message: `Stage 9: Expand shared bucket list into wishlists`
+
+## Shared Playground Stage 10: Shared Calendar and Date Planning
+
+- [x] Added a couple-scoped in-app month calendar and upcoming agenda, with all-day dates, timed events, selected timezones, notes, edit/remove, and optional milestone/wishlist references.
+- [x] Local pgTAP suite passed 14 assertions for RLS/couple isolation, partner reads/edits, all-day/timed shape, timezone validation, same-couple references, and private broadcast authorization.
+- [x] Two separate Chrome instances signed in as local couple members. All-day create, timed event create in Asia/Taipei, edit, agenda view, and deletion synced in both directions; mobile viewport was 384×832 with zero browser-console errors. Screenshots: `docs/verification/stage-10/calendar-mobile.png` and `docs/verification/stage-10/agenda-mobile.png`.
+- [x] Verification: 137 Node tests, lint, TypeScript, production build, and `git diff --check` pass. Build retains existing chunk-size and ineffective dynamic-import warnings.
+- Stage 10 migration is local only; no hosted migration was deployed.
+
+Stage 10 commit message: `Stage 10: Add shared calendar and date planning`
 ## Shared Playground Stage 4: Conversation Games
 
 - [x] Added Question Cards, Who’s More Likely, Lie Detector, and Describe Without Saying It to the shared game catalog and existing request/session/Hub routing.

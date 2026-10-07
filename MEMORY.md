@@ -200,6 +200,29 @@
 - Final verification: 125 Node tests, lint, `npx tsc --noEmit`, production build, 207 local pgTAP checks, and `git diff --check` pass. Production build still reports the existing >500 kB chunk and ineffective dynamic-import warnings. The new migrations `20261006073004_friend_tiny_game_sessions.sql`, `20261006085440_private_profile_avatars.sql`, and `20261006090541_drawing_round_prompts.sql` were applied only to local Supabase. The two disposable local auth accounts and their test data were removed by the authorized local reset. Hosted Supabase remains untouched.
 - Limits: a React HMR dependency-array warning was logged in both open tabs while changing Hub code; it was from hot replacement, and final page reloads produced no new warning. Chrome’s extension file chooser refused file access until “Allow access to file URLs” is enabled, so the avatar save was verified in the in-app browser with one PNG sample. JPEG/WebP/size-boundary browser uploads and physical Android touch/reference-image flows were not checked. Stage 7’s on-device acceptance remains open.
 
+## Shared Playground Stages 7 and 8 follow-up (2026-10-07)
+
+- Stage 7 reference/image/touch acceptance passed in two local authenticated browser contexts using 384×832 mobile emulation. The partner loaded the PNG reference from private Storage, each partner drew using touch events, the first drawing stayed hidden, and both drawings appeared after the second submission. The local drawing pgTAP suite passed 28 assertions; browser console errors were empty. Screenshots are in `docs/verification/stage-7/`.
+- Android emulator Chrome remained on a blank browser screen during a separate attempt, and no physical Galaxy device was attached. Report only browser-emulation verification; physical-device and native file-picker checks remain unverified.
+- Stage 8 adds `relationship_milestones`, couple-member RLS, a secure atomic featured-countdown RPC, and private Realtime broadcasts authorized by couple membership. A test found filtered Postgres Changes did not update the partner view after DELETE; private database-triggered Broadcast fixed create/edit/delete sync without opening unfiltered delete events to unrelated couples.
+- Two local authenticated accounts created, edited, and removed a milestone with Realtime visibility; mobile screenshot inspected at 384×832 and browser console was clean. Pure tests cover validation, annual recurrence, leap-day handling, local date countdown, and upcoming sorting. Local pgTAP passed 15 assertions.
+- Final checks: 130 Node tests, lint, TypeScript, build, and `git diff --check` pass. Existing chunk-size and ineffective dynamic-import build warnings remain. Stage 8 migration is local only; hosted Supabase was not changed.
+- Plan: `docs/superpowers/plans/2026-10-06-stage-8-key-dates.md`. Screenshots: `docs/verification/stage-8/countdown-mobile.png`.
+
+## Shared Playground Stage 9 (2026-10-07)
+
+- Expanded the existing bucket list with date/place/food/gift/trip categories, bounded notes, optional HTTP(S) links, saved/completed states, and category filtering. RLS remains couple-scoped; column grants were extended.
+- Local pgTAP passed 12 wishlist authorization/constraint assertions. Two authenticated local browser accounts added, edited, saved, completed, and removed an item; partner updates synced and the console was clear. Mobile screenshot inspected at 384×832 in `docs/verification/stage-9/wishlist-mobile.png`.
+- Checks: 133 Node tests, lint, TypeScript, build, and diff-check pass. Stage 9 migration was applied locally only; hosted Supabase remains unchanged.
+- Plan: `docs/superpowers/plans/2026-10-07-stage-9-wishlists.md`.
+
+## Shared Playground Stage 10 (2026-10-07)
+
+- Added the couple-scoped shared calendar month grid, upcoming agenda, all-day and timed events, timezone support, notes, and optional links to milestones/wishlist ideas. Added server validation for timezone and same-couple linked records, event shape checks, RLS, and couple-private database Broadcast.
+- Local pgTAP passed 14 assertions. Two separate Chrome browser instances completed all-day creation, timed creation in Asia/Taipei, editing, agenda viewing, and deletion across two authenticated local accounts. Screenshots inspected at 384×832; no console errors.
+- Final checks: 137 Node tests, lint, TypeScript, production build, and diff-check pass. The build retains existing chunk and ineffective dynamic import warnings. Migration is local only.
+- Plan: `docs/superpowers/plans/2026-10-07-stage-10-shared-calendar.md`; screenshots: `docs/verification/stage-10/`.
+
 ## Relationship feature and Android widget roadmap (2026-10-06)
 
 - User approved the feature direction: key dates/countdowns, wishlists, in-app shared calendar/date plans, photo memories, love notes/voice memos, mood/rituals, temporary live location, a shared Love Board, separate Android widgets, and scheduled surprises.

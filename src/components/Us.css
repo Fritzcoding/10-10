@@ -8,6 +8,7 @@
 .us-question { margin: 0; font-size: 19px; line-height: 1.5; }
 .us-timezone { display: flex; align-items: center; gap: 10px; color: var(--hub-muted, #63727c); font-size: 13px; }
 .us-timezone input, .us-form textarea, .us-inline-form input, .us-edit-form input { min-width: 0; padding: 10px 12px; border: 1px solid var(--hub-line, #dce5eb); border-radius: 10px; color: var(--hub-ink, #26343d); background: white; font: inherit; }
+.us-form input:not([type='checkbox']), .us-form select { min-width: 0; padding: 10px 12px; border: 1px solid var(--hub-line, #dce5eb); border-radius: 10px; color: var(--hub-ink, #26343d); background: white; font: inherit; }
 .us-timezone input { width: 180px; }
 .us-form { display: grid; gap: 8px; }
 .us-form textarea { min-height: 88px; resize: vertical; }
@@ -20,6 +21,18 @@
 .us-list li, .us-jokes li, .us-timeline li { display: flex; align-items: center; gap: 9px; min-width: 0; padding: 10px 0; border-bottom: 1px solid var(--hub-line, #dce5eb); }
 .us-list li > span, .us-jokes li > span { flex: 1; overflow-wrap: anywhere; }
 .us-list li.is-complete > span { color: var(--hub-muted, #63727c); text-decoration: line-through; }
+.milestone-list li { display: grid; grid-template-columns: minmax(0, 1fr); align-items: start; gap: 4px; }
+.milestone-list li > span { min-width: 0; overflow-wrap: anywhere; }
+.milestone-list__actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.calendar-month { display: flex; align-items: center; justify-content: space-between; }
+.calendar-grid { display: grid; gap: 5px; }
+.calendar-grid__weekdays, .calendar-grid__days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 5px; text-align: center; }
+.calendar-grid__weekdays span { color: var(--hub-muted, #63727c); font-size: 12px; }
+.calendar-grid__days button, .calendar-grid__days > span { min-width: 0; aspect-ratio: 1; }
+.calendar-grid__days button { border: 1px solid transparent; border-radius: 50%; color: inherit; background: transparent; font: inherit; cursor: pointer; }
+.calendar-grid__days button.has-events { border-color: #91bfd6; background: #e7f3f9; }
+.calendar-grid__days button[aria-pressed='true'] { color: #fff; background: #4f89a6; }
+.shared-calendar h4 { margin: 4px 0; }
 .us-list input[type='checkbox'] { width: 20px; height: 20px; accent-color: #5389a8; }
 .us-edit-form { display: flex; flex: 1; gap: 6px; min-width: 0; }
 .us-edit-form input { flex: 1; }
