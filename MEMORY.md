@@ -247,3 +247,30 @@
 - Two local authenticated browser accounts verified note creation and partner Realtime sync. In the second session (UID #5), the note showed “Your partner” and the private audio played through to 0:03 from an authenticated blob download; browser console errors were empty. The 384×832 mobile view was inspected with no horizontal overflow.
 - Verification passed: 143 tests, lint, TypeScript, production build, `git diff --check`, 17 Stage 12 pgTAP assertions, and the full 281-check local database suite. Security advisors reported no issues. No hosted migration was deployed and no dependencies were added.
 - Stage 12 is complete; Stage 13 is next. Plan: `docs/superpowers/plans/2026-10-07-stage-12-love-notes-voice-memos.md`.
+
+## Shared Playground Stage 13 Complete (2026-10-07)
+
+- Added private-by-default, user-deletable mood check-ins with explicit partner sharing and weekly couple rituals with either/both participation and optional in-app reminders. Safe couple-private Realtime updates do not reveal private mood content.
+- Local migration applied only to local Supabase. Focused Stage 13 pgTAP passed 22 assertions; full database suite passed 303; security advisors found no issues.
+- Two authenticated local browser accounts verified private mood isolation, shared mood sync, partner ritual check-in, and both-partner completion. The 384×832 browser view was screenshot-inspected with no visible overflow; console checks showed no errors.
+- Verification: 148 Node tests, lint, TypeScript, production build, and `git diff --check` passed. Build reports existing chunk-size and ineffective dynamic-import warnings. No new package; hosted Supabase untouched.
+- Stage 13 commit message: `Stage 13: Add mood check-ins and rituals`. Plan: `docs/superpowers/plans/2026-10-07-stage-13-mood-checkins-rituals.md`.
+- Stage 14 (temporary live location) is next.
+
+## Shared Playground Stage 14 Complete (2026-10-07)
+
+- Added foreground-only, explicitly started location shares for 15/30/60 minutes. The database owns expiry; RLS blocks expired locations immediately; stop deletes immediately; pg_cron purges expired rows at one-minute intervals. Generic private Realtime refresh messages never contain coordinates. No offline location queue or history.
+- Stage 14 pgTAP passed 27 assertions; full local DB suite passed 330 checks. Security advisors found no issues. A synthetic 0°, 0° row was visible in both local authenticated browser sessions, screenshot-inspected at 384×832, and deleted after the check.
+- Verification: 152 Node tests, lint, TypeScript, build, diff-check, local pgTAP, and security advisors passed. No new dependency or hosted migration.
+- Limitation: no real location permission was requested and GPS permission/start/denial was not exercised. Error mapping and failure behavior are covered in pure tests; the app asks only after explicit Start. Physical Android background tracking is not part of this stage.
+- Stage 14 commit message: `Stage 14: Add temporary live location`. Plan: `docs/superpowers/plans/2026-10-07-stage-14-temporary-location.md`.
+- Stage 15 (Shared Love Board) is next.
+
+## Shared Playground Stage 15 Complete (2026-10-07)
+
+- Added a shared normalized SVG vector board with independent append-only strokes, private couple Realtime refresh, keyboard drawing, per-author undo, and confirmed shared clear. The local-only migration bounds input and serializes undo/clear generations; no dependency was added.
+- Stage 15 pgTAP passed 34 assertions; full local database suite passed 364 checks. Two authenticated browser accounts drew independently and received each other's strokes. Undo preserved the other partner's drawing; test artwork was cleared. Mobile view screenshot-inspected at 384×832; browser console checks were clear.
+- Verification passed: 156 Node tests, lint, TypeScript, production build, and diff check. Existing chunk-size and ineffective dynamic-import warnings remain. No hosted migration was deployed.
+- Limitation: browser pointer/touch input and physical Android were not exercised; keyboard drawing and pointer coordinate normalization were checked. Stage 14 still has no actual GPS permission test.
+- Stage 15 commit message: `Stage 15: Add shared Love Board`. Plan: `docs/superpowers/plans/2026-10-07-stage-15-love-board.md`.
+- Stage 16 (Android companion and separate widgets) is next.

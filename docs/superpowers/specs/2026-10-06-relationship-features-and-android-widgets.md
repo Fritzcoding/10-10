@@ -1,6 +1,6 @@
 # Shared Playground: Relationship Features and Android Widgets
 
-**Status:** Approved design; Stages 8–12 complete locally, Stages 13–17 pending.
+**Status:** Approved design; Stages 8–15 complete locally, Stages 16–17 pending.
 **Date:** 2026-10-06
 **Supersedes:** The future Stage 8 item in `2026-09-30-shared-playground-roadmap.md`. Stages 0–7 remain as recorded there.
 
@@ -18,7 +18,10 @@ Stages 0–10 have been implemented and locally verified. Stage 7 mobile browser
 - [x] Stage 10 — shared calendar and date planning; local migration and two-instance Chrome checks passed.
 - [x] Stage 11 — private photo memories; local migration and two-account local browser checks passed.
 - [x] Stage 12 — love notes and voice memos; local migration, authorization, two-account note sync, and partner playback passed.
-- [ ] Stages 13–17 — pending.
+- [x] Stage 13 — mood check-ins and weekly rituals; local migration, private/shared visibility, and two-account ritual sync passed.
+- [x] Stage 14 — temporary live location; local expiry/cleanup and two-account synthetic-coordinate visibility passed. Actual device geolocation permission/GPS was not exercised.
+- [x] Stage 15 — shared vector Love Board; two-account independent strokes, Realtime visibility, author-only undo, shared clear, and keyboard alternative passed locally. Physical pointer/touch and Android device checks remain unverified.
+- [ ] Stages 16–17 — pending.
 
 ## Approved scope and order
 

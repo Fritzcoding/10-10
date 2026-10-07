@@ -45,6 +45,12 @@
 .love-notes__list audio { width: 100%; min-height: 42px; }
 .love-notes__list .milestone-list__actions { gap: 6px; }
 .love-notes__list .us-text-button { min-height: 42px; padding: 8px 10px; border-radius: 10px; background: #edf5fa; text-decoration: none; }
+.mood-rituals h4 { margin: 4px 0; }
+.mood-rituals > section { display: grid; gap: 10px; }
+.mood-rituals__choice { display: flex; align-items: center; gap: 8px; min-height: 42px; }
+.mood-rituals__choice input { width: 20px; height: 20px; accent-color: #5389a8; }
+.mood-rituals .milestone-list__actions { gap: 6px; }
+.mood-rituals .us-text-button { min-height: 42px; padding: 8px 10px; border-radius: 10px; background: #edf5fa; text-decoration: none; }
 .photo-memories__grid p { margin: 0; overflow-wrap: anywhere; }
 .photo-memories__grid small { color: var(--hub-muted, #63727c); }
 .photo-memories__grid input, .photo-memories__grid select, .photo-memories input[type='file'] { width: 100%; min-width: 0; }
@@ -56,6 +62,15 @@
 .us-timeline p { margin: 3px 0 0; overflow-wrap: anywhere; line-height: 1.45; }
 .us-empty { margin: 0; color: var(--hub-muted, #63727c); }
 .us-message { margin: 0; color: #426f88; }
+.temporary-location li span > small { display: block; }
+.love-board__controls, .love-board__actions, .love-board__colors { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.love-board__colors button { width: 42px; height: 42px; border: 3px solid #fff; border-radius: 50%; background: var(--pen-color); box-shadow: 0 0 0 1px #cad7dc; cursor: pointer; }
+.love-board__colors button[aria-pressed='true'] { box-shadow: 0 0 0 3px #426f88; }
+.love-board__controls input[type='range'] { min-width: 90px; }
+.love-board__canvas { display: block; width: 100%; height: auto; aspect-ratio: 1; border: 1px solid #dbe5e9; border-radius: 14px; background: #fff; touch-action: none; user-select: none; cursor: crosshair; }
+.love-board__canvas:focus-visible { outline: 3px solid #6c9fbd; outline-offset: 2px; }
+.love-board__actions button { min-height: 42px; padding: 8px 12px; border: 0; border-radius: 10px; background: #edf5fa; color: #426f88; font: inherit; cursor: pointer; }
+.love-board__actions button:disabled { opacity: .55; cursor: not-allowed; }
 .us-panel button:focus-visible, .us-panel input:focus-visible, .us-panel textarea:focus-visible { outline: 2px solid #6c9fbd; outline-offset: 2px; }
 @media (max-width: 400px) {
   .us-section { padding: 14px; }

@@ -220,6 +220,37 @@ Stage 11 commit message: `Stage 11: Add private photo memories`
 - [x] Stage 12 passed: 143 tests, lint, TypeScript, build, 281 local pgTAP checks, security advisors, and diff-check. The 384×832 mobile layout was inspected. No hosted migration was deployed; no dependencies were added.
 
 Stage 12 commit message: `Stage 12: Add love notes and voice memos`
+
+## Shared Playground Stage 13: Mood Check-ins and Rituals
+
+- [x] Added private-by-default mood check-ins, explicit couple sharing, author deletion, weekly either/both rituals, optional in-app reminders, and couple-private Realtime refresh.
+- [x] Local database suite passed 303 checks, including 22 mood/ritual assertions; security advisors found no issues.
+- [x] Two local authenticated browser sessions verified private mood isolation, shared mood Realtime visibility, and both-partner ritual check-ins. The 384×832 screenshot was inspected and both browser consoles were clear.
+- [x] Verification: 148 Node tests, lint, TypeScript, production build, and `git diff --check` passed. Existing large-chunk and ineffective dynamic-import build warnings remain.
+- Migration is local only; no hosted Supabase changes or new dependencies.
+
+Stage 13 commit message: `Stage 13: Add mood check-ins and rituals`
+
+## Shared Playground Stage 14: Temporary Live Location
+
+- [x] Added opt-in, foreground-only location sharing for 15, 30, or 60 minutes. Server RPCs own expiry and coordinates; RLS hides expired rows immediately, stop deletes immediately, and local/Supabase `pg_cron` physically purges expired rows every minute.
+- [x] Local pgTAP passed 27 Stage 14 assertions for member start/update/stop, bounded durations, coordinate validation, expiry, physical purge, partner access, unrelated-account isolation, and private Realtime refresh. Full database suite passed 330 checks; security advisors found no issues.
+- [x] Two authenticated browser sessions displayed a synthetic coordinate to the partner; the synthetic row was then removed. The 384×832 view was screenshot-inspected with no horizontal overflow and both browser consoles were clear.
+- [x] Verification: 152 Node tests, lint, TypeScript, production build, and `git diff --check` passed. Existing chunk-size and ineffective dynamic-import warnings remain. No hosted migration was deployed and no dependency was added.
+- Actual browser location permission and GPS were not requested or tested; the user-facing permission-denial/error path is covered by pure tests. The app requests permission only after the user presses Start.
+
+Stage 14 commit message: `Stage 14: Add temporary live location`
+
+## Shared Playground Stage 15: Shared Love Board
+
+- [x] Added a couple-scoped vector board with independent stroke inserts, bounded normalized coordinates, keyboard drawing, pointer/touch handlers, author-only undo, and confirmed shared clear. Private Realtime events carry only a refresh signal; local migration only.
+- [x] Stage pgTAP passed 34 assertions; full local database suite passed 364 checks, including member authorization, independent strokes, undo isolation, generation changes, and stale-write rejection.
+- [x] Two authenticated browser accounts drew independently and received each other's strokes in Realtime. Undo removed only its author's stroke; the shared board was cleared after testing. Mobile screenshot inspected at 384×832; browser console checks were clear.
+- [x] Verification: 156 Node tests, lint, TypeScript, production build, and `git diff --check` passed. Existing chunk-size and ineffective dynamic-import warnings remain. No dependency or hosted migration.
+- Pointer/touch drawing was not physically exercised; keyboard drawing and pointer coordinate normalization were verified. Physical Android verification remains for the native stages.
+
+Stage 15 commit message: `Stage 15: Add shared Love Board`
+
 ## Shared Playground Stage 4: Conversation Games
 
 - [x] Added Question Cards, Who’s More Likely, Lie Detector, and Describe Without Saying It to the shared game catalog and existing request/session/Hub routing.
