@@ -1,6 +1,6 @@
 # Shared Playground: Relationship Features and Android Widgets
 
-**Status:** Approved design; Stages 8–10 complete locally, Stages 11–17 pending.
+**Status:** Approved design; Stages 8–11 complete locally, Stages 12–17 pending.
 **Date:** 2026-10-06
 **Supersedes:** The future Stage 8 item in `2026-09-30-shared-playground-roadmap.md`. Stages 0–7 remain as recorded there.
 
@@ -16,7 +16,8 @@ Stages 0–10 have been implemented and locally verified. Stage 7 mobile browser
 - [x] Stage 8 — key dates and countdowns; local migration and two-account checks passed.
 - [x] Stage 9 — wishlists; existing bucket list extended, local migration and two-account checks passed.
 - [x] Stage 10 — shared calendar and date planning; local migration and two-instance Chrome checks passed.
-- [ ] Stages 11–17 — not started.
+- [x] Stage 11 — private photo memories; local migration and two-account local browser checks passed.
+- [ ] Stages 12–17 — pending.
 
 ## Approved scope and order
 

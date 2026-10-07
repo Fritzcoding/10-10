@@ -230,3 +230,12 @@
 - Location sharing is temporary, explicitly started, duration-limited, and stoppable; no continuous tracking by default. Widgets are independent and configurable, with user-selected photo or default love theme backgrounds.
 - Android widgets show a Love Board preview and open the app for freehand drawing. Widget refresh is near-live best-effort because Android controls background update timing.
 - Spec: `docs/superpowers/specs/2026-10-06-relationship-features-and-android-widgets.md` (commit `8f9f925`). User review of the written spec is pending; do not begin implementation planning until approved.
+
+## Shared Playground Stage 11: Photo Memories (complete, 2026-10-07)
+
+- Added a private `couple-memories` bucket, couple-scoped `photo_memories` metadata/RLS, same-couple timeline references, and realtime publication. Local reset/replay passed; photo-memory pgTAP passed 16 checks and the full local suite passed 264.
+- Added pure validation and “on this day” helpers plus the shared album UI. Account UID #158 uploaded and saw a 2025-10-07 memory with caption and timeline link in the 384×832 mobile view; browser console errors were empty. Authenticated Storage downloads use object URLs revoked on cleanup.
+- Verification passed: 140 Node tests, lint, typecheck, production build, and diff check. Build reports existing chunk-size and ineffective dynamic-import warnings. No package was added and no hosted migration was deployed.
+- Two local accounts completed the browser flow: UID #158 uploaded the memory; paired UID #157 loaded it with the timeline link and “On this day” card, then removed it and saw the empty album. The browser console had no errors. A mobile-width screenshot was captured and visually inspected at 384×832 in the browser session (not saved as a repository artifact).
+- Stage 11 is complete. Stage 12 is next. Migration remains local only; no hosted changes.
+- Plan: `docs/superpowers/plans/2026-10-07-stage-11-photo-memories.md`.

@@ -33,6 +33,14 @@
 .calendar-grid__days button.has-events { border-color: #91bfd6; background: #e7f3f9; }
 .calendar-grid__days button[aria-pressed='true'] { color: #fff; background: #4f89a6; }
 .shared-calendar h4 { margin: 4px 0; }
+.photo-memories__anniversary { display: grid; gap: 8px; padding: 12px; border-radius: 14px; background: #edf5fa; }
+.photo-memories__anniversary h4 { margin: 0; }
+.photo-memories__grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); gap: 12px; margin: 0; padding: 0; list-style: none; }
+.photo-memories__grid li { display: grid; align-content: start; gap: 7px; min-width: 0; padding: 10px; border: 1px solid var(--hub-line, #dce5eb); border-radius: 14px; background: white; }
+.photo-memories__grid img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 10px; background: #edf5fa; }
+.photo-memories__grid p { margin: 0; overflow-wrap: anywhere; }
+.photo-memories__grid small { color: var(--hub-muted, #63727c); }
+.photo-memories__grid input, .photo-memories__grid select, .photo-memories input[type='file'] { width: 100%; min-width: 0; }
 .us-list input[type='checkbox'] { width: 20px; height: 20px; accent-color: #5389a8; }
 .us-edit-form { display: flex; flex: 1; gap: 6px; min-width: 0; }
 .us-edit-form input { flex: 1; }

@@ -200,6 +200,16 @@ Stage 9 commit message: `Stage 9: Expand shared bucket list into wishlists`
 - Stage 10 migration is local only; no hosted migration was deployed.
 
 Stage 10 commit message: `Stage 10: Add shared calendar and date planning`
+
+## Shared Playground Stage 11: Photo Memories
+
+- [x] Added couple-scoped photo metadata, private `couple-memories` Storage, 5 MiB JPEG/PNG/WebP limits, Storage/row RLS, and same-couple timeline links. Local migration replay and 16 photo-memory pgTAP checks passed; the full local pgTAP suite passed 264 checks.
+- [x] Added pure upload/date validation and shared album UI for authenticated display, captions, dates, timeline links, edits, deletion, and “On this day”.
+- [x] Two local accounts verified the flow: UID #158 uploaded the photo; paired UID #157 loaded it in the album and “On this day”; UID #157 removed it and the album showed 0 photos with the empty state. Console errors were empty. Mobile layout was captured and visually inspected at 384×832 in the browser session.
+- [x] `npm test` passed 140 tests; lint, TypeScript, production build, 264 local pgTAP checks, and `git diff --check` passed. Existing chunk-size and ineffective dynamic-import build warnings remain.
+- Migration remains local; no hosted Supabase changes. No dependencies added.
+
+Stage 11 commit message: `Stage 11: Add private photo memories`
 ## Shared Playground Stage 4: Conversation Games
 
 - [x] Added Question Cards, Who’s More Likely, Lie Detector, and Describe Without Saying It to the shared game catalog and existing request/session/Hub routing.
