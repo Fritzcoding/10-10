@@ -7,6 +7,7 @@ import Milestones from './Milestones'
 import { filterWishlistItems, validateWishlistItem, WISHLIST_CATEGORIES, type WishlistCategory } from '../lib/wishlists'
 import SharedCalendar from './SharedCalendar'
 import PhotoMemories from './PhotoMemories'
+import LoveNotes from './LoveNotes'
 
 type UsProps = { userId?: string }
 type DailyQuestion = { id: string; local_date: string; prompt: string }
@@ -152,6 +153,7 @@ function Us({ userId }: UsProps) {
       <Milestones coupleId={coupleId} timezone={timezone} />
       <SharedCalendar coupleId={coupleId} timezone={timezone} />
       <PhotoMemories coupleId={coupleId} timezone={timezone} timeline={timeline} />
+      <LoveNotes coupleId={coupleId} userId={userId ?? ''} />
 
       <section className="us-section" aria-labelledby="bucket-title"><div className="us-section__heading"><h3 id="bucket-title">Our wishlists</h3><small>{bucket.filter((item) => item.completed).length} of {bucket.length} done</small></div>
         <form className="us-form" onSubmit={addBucket}>

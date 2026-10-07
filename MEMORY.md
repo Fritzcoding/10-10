@@ -239,3 +239,11 @@
 - Two local accounts completed the browser flow: UID #158 uploaded the memory; paired UID #157 loaded it with the timeline link and “On this day” card, then removed it and saw the empty album. The browser console had no errors. A mobile-width screenshot was captured and visually inspected at 384×832 in the browser session (not saved as a repository artifact).
 - Stage 11 is complete. Stage 12 is next. Migration remains local only; no hosted changes.
 - Plan: `docs/superpowers/plans/2026-10-07-stage-11-photo-memories.md`.
+
+## Shared Playground Stage 12 Complete (2026-10-07)
+
+- Implemented couple-scoped love notes and private voice memo support with a local-only migration, 5 MiB file limit, 60-second duration bound, Realtime metadata sync, recording, playback, and deletion. No dependencies added; nothing deployed to hosted Supabase.
+- Pure validation tests passed. The local Stage 12 migration replay and 17 pgTAP assertions passed; the full local pgTAP suite passed 281 checks. Security advisors reported no issues.
+- Two local authenticated browser accounts verified note creation and partner Realtime sync. In the second session (UID #5), the note showed “Your partner” and the private audio played through to 0:03 from an authenticated blob download; browser console errors were empty. The 384×832 mobile view was inspected with no horizontal overflow.
+- Verification passed: 143 tests, lint, TypeScript, production build, `git diff --check`, 17 Stage 12 pgTAP assertions, and the full 281-check local database suite. Security advisors reported no issues. No hosted migration was deployed and no dependencies were added.
+- Stage 12 is complete; Stage 13 is next. Plan: `docs/superpowers/plans/2026-10-07-stage-12-love-notes-voice-memos.md`.

@@ -210,6 +210,16 @@ Stage 10 commit message: `Stage 10: Add shared calendar and date planning`
 - Migration remains local; no hosted Supabase changes. No dependencies added.
 
 Stage 11 commit message: `Stage 11: Add private photo memories`
+
+## Shared Playground Stage 12: Love Notes and Voice Memos (complete)
+
+- [x] Added couple-scoped love notes, private voice-memo Storage policies (5 MiB cap), duration constraints (60 seconds), Realtime, and recording/playback UI. Local migration replay and 17 Stage 12 pgTAP checks passed; full local database suite passed 281 checks.
+- [x] Pure validation tests cover trimmed 2,000-character notes and supported audio type, size, and duration bounds. Full app checks passed: 143 tests, lint, TypeScript, production build, and `git diff --check`.
+- [x] Two local authenticated browser sessions verified note creation and Realtime sync with author identity; the 384×832 view was inspected with no horizontal overflow and no browser-console errors.
+- [x] In a second authenticated browser session (UID #5), the partner saw the note as “Your partner” and played the private memo through to 0:03; the player used the authenticated blob download and the browser console had no errors.
+- [x] Stage 12 passed: 143 tests, lint, TypeScript, build, 281 local pgTAP checks, security advisors, and diff-check. The 384×832 mobile layout was inspected. No hosted migration was deployed; no dependencies were added.
+
+Stage 12 commit message: `Stage 12: Add love notes and voice memos`
 ## Shared Playground Stage 4: Conversation Games
 
 - [x] Added Question Cards, Who’s More Likely, Lie Detector, and Describe Without Saying It to the shared game catalog and existing request/session/Hub routing.
