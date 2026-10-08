@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
-import { getBackgroundMusicVolume, setBackgroundMusicVolume } from '../lib/audio'
+import { getBackgroundMusicName, getBackgroundMusicVolume, resetBackgroundMusic, setBackgroundMusicVolume, setCustomBackgroundMusic } from '../lib/audio'
 import { formatProfileUid } from '../lib/friendSearch'
 import { ensureCurrentProfile } from '../lib/profile'
 import { supabase } from '../lib/supabase'
@@ -12,10 +12,13 @@ function Settings({ onLogout }: SettingsProps) {
   const [displayName, setDisplayName] = useState('')
   const [uid, setUid] = useState<number | null>(null)
   const [volume, setVolume] = useState(getBackgroundMusicVolume())
+  const [musicName, setMusicName] = useState('Soft ambient loop')
+  const [isSavingMusic, setIsSavingMusic] = useState(false)
   const [message, setMessage] = useState('')
   const [isSaving, setIsSaving] = useState(false)
 
   useEffect(() => {
+    void getBackgroundMusicName().then(setMusicName).catch(() => setMusicName('Soft ambient loop'))
     if (!supabase) return
     const client = supabase
     client.auth.getUser().then(async ({ data, error }) => {
@@ -92,6 +95,21 @@ function Settings({ onLogout }: SettingsProps) {
       <div className="settings-card">
         <label htmlFor="music-volume">Background music</label>
         <div className="settings-volume-row"><input id="music-volume" type="range" min="0" max="1" step="0.01" value={volume} onChange={(event) => { const nextVolume = Number(event.target.value); setVolume(nextVolume); setBackgroundMusicVolume(nextVolume) }} /><span>{Math.round(volume * 100)}%</span></div>
+        <p className="settings-music-name" aria-live="polite">Now selected: {musicName} · repeats continuously</p>
+        <label htmlFor="background-music-file">Choose your own music</label>
+        <input id="background-music-file" type="file" accept="audio/*" disabled={isSavingMusic} onChange={(event) => {
+          const file = event.target.files?.[0]
+          if (!file) return
+          setIsSavingMusic(true)
+          void setCustomBackgroundMusic(file).then(() => { setMusicName(file.name); setMessage('Your music is saved on this device and will repeat.') })
+            .catch((error) => setMessage((error as Error).message)).finally(() => { setIsSavingMusic(false); event.target.value = '' })
+        }} />
+        <p className="settings-music-hint">Music files stay on this device. Choose an audio file smaller than 25 MB.</p>
+        <button type="button" className="settings-music-reset" disabled={isSavingMusic || musicName === 'Soft ambient loop'} onClick={() => {
+          setIsSavingMusic(true)
+          void resetBackgroundMusic().then(() => { setMusicName('Soft ambient loop'); setMessage('Soft ambient music restored.') })
+            .catch((error) => setMessage((error as Error).message)).finally(() => setIsSavingMusic(false))
+        }}>{isSavingMusic ? 'Saving…' : 'Use soft ambient music'}</button>
       </div>
       <form className="settings-card settings-form" onSubmit={saveDisplayName}>
         <label htmlFor="display-name">Display name</label>

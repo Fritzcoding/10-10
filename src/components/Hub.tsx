@@ -14,11 +14,12 @@ import './HubTheme.css'
 import { isSessionForUser, shouldKeepGameSessionOpen, type GameSession } from '../lib/gameSessions'
 import { useGamePresence } from '../lib/gamePresence'
 import { formatProfileUid } from '../lib/friendSearch'
+import { initialWidgetTab } from '../lib/androidWidgetNavigation'
 
 type HubProps = { onLogout: () => void }
 
 function Hub({ onLogout }: HubProps) {
-  const [activeTab, setActiveTab] = useState<HubTab>('games')
+  const [activeTab, setActiveTab] = useState<HubTab>(() => initialWidgetTab(window.location.search))
   const [userId, setUserId] = useState<string>()
   const [displayUid, setDisplayUid] = useState<number | null>(null)
   const [activeSession, setActiveSession] = useState<GameSession | null>(null)
@@ -100,7 +101,7 @@ function Hub({ onLogout }: HubProps) {
         {activeTab === 'profile' && <Profile />}
         {activeTab === 'settings' && <Settings onLogout={onLogout} />}
         {activeTab === 'games' && <Games key={userId ?? 'guest'} userId={userId} onlineUserIds={onlineUserIds} activeSession={activeSession} onSessionExit={() => { dismissedSessionId.current = activeSession?.id ?? null; setActiveSession(null) }} />}
-        {activeTab === 'us' && <Us userId={userId} />}
+        {activeTab === 'us' && <Us userId={userId} widgetTarget={new URLSearchParams(window.location.search).get('widget') ?? undefined} />}
       </section>
       <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
     </main>

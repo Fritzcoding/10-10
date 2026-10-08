@@ -1,0 +1,12 @@
+<resources>
+    <string name="widget_calendar">Shared calendar agenda</string>
+    <string name="widget_plans">Upcoming plans</string>
+    <string name="widget_note">Love note</string>
+    <string name="widget_voice">Voice memo</string>
+    <string name="widget_mood">Shared mood</string>
+    <string name="widget_location">Active shared location</string>
+    <string name="widget_countdown">Chosen countdown</string>
+    <string name="widget_board">Love Board</string>
+    <string name="pick_background">Choose a background photo</string>
+    <string name="hide_when_locked">Hide sensitive text while locked</string>
+</resources>

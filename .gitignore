@@ -84,3 +84,10 @@ __pycache__/
 .next/
 .nuxt/
 
+
+# Android local build outputs
+android/.gradle/
+android/local.properties
+android/app/build/
+android/app/src/main/assets/
+

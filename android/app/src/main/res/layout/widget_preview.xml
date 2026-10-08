@@ -1,0 +1,15 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root" android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="#F3F9FC" android:padding="12dp">
+    <ImageView android:id="@+id/widget_background" android:layout_width="match_parent" android:layout_height="match_parent"
+        android:scaleType="centerCrop" android:contentDescription="" android:visibility="gone" />
+    <LinearLayout android:id="@+id/widget_content" android:layout_width="match_parent" android:layout_height="match_parent"
+        android:gravity="center_vertical" android:orientation="vertical" android:background="#DDF3F9FC" android:padding="10dp">
+        <TextView android:id="@+id/widget_title" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:textColor="#426F88" android:textSize="13sp" android:textStyle="bold" android:maxLines="1" />
+        <TextView android:id="@+id/widget_body" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="6dp" android:textColor="#26343D" android:textSize="17sp" android:maxLines="3" android:ellipsize="end" />
+        <ImageView android:id="@+id/widget_art" android:layout_width="match_parent" android:layout_height="0dp"
+            android:layout_weight="1" android:layout_marginTop="4dp" android:scaleType="fitCenter" android:contentDescription="Shared Love Board" android:visibility="gone" />
+    </LinearLayout>
+</FrameLayout>

@@ -1,6 +1,17 @@
 .us-panel { display: grid; gap: 18px; color: var(--hub-ink, #26343d); }
 .us-intro h2 { margin: 0; }
 .us-intro > p:last-child { margin: 8px 0 0; color: var(--hub-muted, #63727c); }
+.us-section-nav { display: flex; gap: 8px; overflow-x: auto; padding: 2px 0 8px; scrollbar-width: thin; }
+.us-section-nav a { flex: 0 0 auto; padding: 8px 12px; border: 1px solid var(--hub-line, #dce5eb); border-radius: 999px; color: #315a71; background: #f9fcfe; font-size: 14px; text-decoration: none; }
+.us-section-nav a:focus-visible { outline: 2px solid #6c9fbd; outline-offset: 2px; }
+.us-panel [id^='us-'] { scroll-margin-top: 16px; }
+.scheduled-surprises > p { margin: 0; color: var(--hub-muted, #63727c); }
+.scheduled-surprises h4 { margin: 0 0 8px; }
+.scheduled-surprises__list { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.scheduled-surprises__list li { padding: 14px; border: 1px solid var(--hub-line, #dce5eb); border-radius: 14px; background: white; }
+.scheduled-surprises__list p { margin: 8px 0; overflow-wrap: anywhere; line-height: 1.5; }
+.scheduled-surprises__list img { display: block; width: min(100%, 420px); max-height: 360px; object-fit: cover; border-radius: 10px; }
+.scheduled-surprises__list small, .scheduled-surprises .us-list small { display: block; color: var(--hub-muted, #63727c); }
 .us-section { display: grid; gap: 12px; padding: 18px; border: 1px solid var(--hub-line, #dce5eb); border-radius: 18px; background: #f9fcfe; }
 .us-section h3 { margin: 0; font-size: 20px; }
 .us-section__heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; }

@@ -1,0 +1,10 @@
+--------- beginning of main
+10-07 23:51:33.663 I/AssistStructure( 1876): Flattened final assist data: 2932 bytes, containing 1 windows, 4 views
+--------- beginning of system
+10-07 23:51:33.711 I/ImeTracker( 1876): app.couple:c47493e8: onRequestShow at ORIGIN_CLIENT reason SHOW_SOFT_INPUT fromUser false userId 0 displayId 0
+10-07 23:51:33.711 D/InsetsController( 1876): show(ime())
+10-07 23:51:33.711 I/ImeTracker( 1876): app.couple:c47493e8: onCancelled at PHASE_CLIENT_APPLY_ANIMATION
+10-07 23:51:35.275 I/ImeTracker( 1876): system_server:78384fd5: onCancelled at PHASE_CLIENT_ON_CONTROLS_CHANGED
+10-07 23:51:35.286 D/VRI[MainActivity]( 1876): WindowInsets changed: ime:[0,0,0,1110] 
+10-07 23:51:47.521 I/app.couple( 1876): Explicit concurrent mark compact GC freed 1024KB AllocSpace bytes, 2(64KB) LOS objects, 49% free, 3620KB/7240KB, paused 1.951ms,8.600ms total 28.089ms
+10-07 23:52:39.028 I/app.couple( 1876): Explicit concurrent mark compact GC freed 384KB AllocSpace bytes, 3(96KB) LOS objects, 49% free, 3588KB/7176KB, paused 2.515ms,9.853ms total 28.877ms

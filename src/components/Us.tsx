@@ -11,15 +11,18 @@ import LoveNotes from './LoveNotes'
 import MoodRituals from './MoodRituals'
 import TemporaryLocation from './TemporaryLocation'
 import LoveBoard from './LoveBoard'
+import { shouldScrollToWidgetTarget, widgetTargetId } from '../lib/androidWidgetNavigation'
+import { US_SECTION_LINKS } from '../lib/scheduledSurprises'
+import ScheduledSurprises from './ScheduledSurprises'
 
-type UsProps = { userId?: string }
+type UsProps = { userId?: string; widgetTarget?: string }
 type DailyQuestion = { id: string; local_date: string; prompt: string }
 type DailyAnswer = { user_id: string; answer: string }
 type BucketItem = { id: string; title: string; completed: boolean; category: WishlistCategory; note: string; link: string; saved: boolean }
 type InsideJoke = { id: string; text: string }
 type UsTimelineEvent = TimelineEvent & { summary: string }
 
-function Us({ userId }: UsProps) {
+function Us({ userId, widgetTarget }: UsProps) {
   const [coupleId, setCoupleId] = useState('')
   const [timezone, setTimezone] = useState('UTC')
   const [question, setQuestion] = useState<DailyQuestion | null>(null)
@@ -87,6 +90,14 @@ function Us({ userId }: UsProps) {
     return () => { window.clearInterval(dailyRefresh); void client.removeChannel(channel) }
   }, [refresh, userId])
 
+  useEffect(() => {
+    if (!shouldScrollToWidgetTarget(widgetTarget, loading, coupleId)) return
+    const timeout = window.setTimeout(() => {
+      document.getElementById(`widget-${widgetTargetId(widgetTarget)}`)?.scrollIntoView({ block: 'start' })
+    }, 250)
+    return () => window.clearTimeout(timeout)
+  }, [coupleId, loading, widgetTarget])
+
   const run = async (action: () => Promise<unknown>, success?: string) => {
     if (!supabase) return
     setMessage('')
@@ -143,7 +154,8 @@ function Us({ userId }: UsProps) {
     <header className="us-intro"><p className="hub-panel__eyebrow">Our shared space</p><h2>Little things that are ours.</h2><p>Questions, plans, and the stories only the two of you know.</p></header>
     {!coupleId && <p className="us-empty">Pair with your partner to start your shared space.</p>}
     {coupleId && <>
-      <section className="us-section" aria-labelledby="daily-question-title">
+      <nav className="us-section-nav" aria-label="Shared space sections">{US_SECTION_LINKS.map(({ id, label }) => <a href={`#${id}`} key={id}>{label}</a>)}</nav>
+      <section className="us-section" id="us-daily-question" aria-labelledby="daily-question-title">
         <div className="us-section__heading"><div><p className="hub-panel__eyebrow">Today, together</p><h3 id="daily-question-title">Daily question</h3></div><small>{question?.local_date}</small></div>
         <p className="us-question">{question?.prompt ?? DAILY_QUESTIONS[0]}</p>
         <label className="us-timezone">Day changes at<input aria-label="Couple timezone" value={timezone} onChange={(event) => setTimezone(event.target.value)} list="us-timezones" /><datalist id="us-timezones"><option value="UTC" /><option value="Asia/Taipei" /><option value="Asia/Tokyo" /><option value="America/Los_Angeles" /><option value="America/New_York" /><option value="Europe/London" /><option value="Europe/Paris" /><option value="Australia/Sydney" /></datalist></label>
@@ -153,15 +165,16 @@ function Us({ userId }: UsProps) {
             : <form className="us-form" onSubmit={submitAnswer}><label htmlFor="daily-answer">Your answer</label><textarea id="daily-answer" maxLength={1000} value={answer} onChange={(event) => setAnswer(event.target.value)} /><button type="submit">Save my answer</button></form>}
       </section>
 
-      <Milestones coupleId={coupleId} timezone={timezone} />
-      <SharedCalendar coupleId={coupleId} timezone={timezone} />
-      <PhotoMemories coupleId={coupleId} timezone={timezone} timeline={timeline} />
-      <LoveNotes coupleId={coupleId} userId={userId ?? ''} />
-      {userId && <MoodRituals coupleId={coupleId} timezone={timezone} userId={userId} />}
-      {userId && coupleId && <TemporaryLocation coupleId={coupleId} userId={userId} />}
-      {userId && coupleId && <LoveBoard coupleId={coupleId} userId={userId} />}
+      <div id="widget-countdown"><div id="us-dates"><Milestones coupleId={coupleId} timezone={timezone} /></div></div>
+      <div id="widget-calendar"><div id="us-calendar"><SharedCalendar coupleId={coupleId} timezone={timezone} /></div></div>
+      <div id="widget-photo-memories"><div id="us-photos"><PhotoMemories coupleId={coupleId} timezone={timezone} timeline={timeline} /></div></div>
+      <div id="widget-note"><div id="us-notes"><LoveNotes coupleId={coupleId} userId={userId ?? ''} /></div></div>
+      <div id="us-surprises"><ScheduledSurprises userId={userId ?? ''} /></div>
+      {userId && <div id="widget-mood"><div id="us-moods"><MoodRituals coupleId={coupleId} timezone={timezone} userId={userId} /></div></div>}
+      {userId && coupleId && <div id="widget-location"><div id="us-location"><TemporaryLocation coupleId={coupleId} userId={userId} /></div></div>}
+      {userId && coupleId && <div id="widget-board"><div id="us-board"><LoveBoard coupleId={coupleId} userId={userId} /></div></div>}
 
-      <section className="us-section" aria-labelledby="bucket-title"><div className="us-section__heading"><h3 id="bucket-title">Our wishlists</h3><small>{bucket.filter((item) => item.completed).length} of {bucket.length} done</small></div>
+      <section className="us-section" id="us-wishlists" aria-labelledby="bucket-title"><div className="us-section__heading"><h3 id="bucket-title">Our wishlists</h3><small>{bucket.filter((item) => item.completed).length} of {bucket.length} done</small></div>
         <form className="us-form" onSubmit={addBucket}>
           <label htmlFor="new-bucket-item">Idea</label><input id="new-bucket-item" maxLength={160} placeholder="Something we’d love to do…" value={newBucket} onChange={(event) => setNewBucket(event.target.value)} />
           <label htmlFor="new-bucket-category">Category</label><select id="new-bucket-category" value={newBucketCategory} onChange={(event) => setNewBucketCategory(event.target.value)}>{WISHLIST_CATEGORIES.map((value) => <option key={value} value={value}>{value[0].toUpperCase() + value.slice(1)}</option>)}</select>
@@ -177,12 +190,12 @@ function Us({ userId }: UsProps) {
         {bucket.length === 0 && <p className="us-empty">Add date ideas, places, food, gifts, and trips to your shared wishlists.</p>}
       </section>
 
-      <section className="us-section" aria-labelledby="jokes-title"><h3 id="jokes-title">Inside jokes</h3><form className="us-inline-form" onSubmit={addJoke}><label className="sr-only" htmlFor="new-inside-joke">Save an inside joke</label><input id="new-inside-joke" maxLength={500} placeholder="A phrase only you two understand…" value={newJoke} onChange={(event) => setNewJoke(event.target.value)} /><button type="submit">Save</button></form>
+      <section className="us-section" id="us-jokes" aria-labelledby="jokes-title"><h3 id="jokes-title">Inside jokes</h3><form className="us-inline-form" onSubmit={addJoke}><label className="sr-only" htmlFor="new-inside-joke">Save an inside joke</label><input id="new-inside-joke" maxLength={500} placeholder="A phrase only you two understand…" value={newJoke} onChange={(event) => setNewJoke(event.target.value)} /><button type="submit">Save</button></form>
         <ul className="us-jokes">{jokes.map((joke) => <li key={joke.id}>{editingJoke === joke.id ? <form className="us-edit-form" onSubmit={(event) => { event.preventDefault(); const text = editText.trim(); if (!text || text.length > 500) { setMessage('Use 1 to 500 characters.'); return } void run(async () => { const { error } = await supabase!.from('inside_jokes').update({ text }).eq('id', joke.id); if (error) throw error; setEditingJoke(null) }) }}><input aria-label="Edit inside joke" maxLength={500} value={editText} onChange={(event) => setEditText(event.target.value)} /><button type="submit">Save</button></form> : <><span>{joke.text}</span><button className="us-text-button" type="button" onClick={() => { setEditingJoke(joke.id); setEditText(joke.text) }}>Edit</button><button className="us-text-button" type="button" onClick={() => void run(async () => { const { error } = await supabase!.from('inside_jokes').delete().eq('id', joke.id); if (error) throw error })}>Remove</button></>}</li>)}</ul>
         {jokes.length === 0 && <p className="us-empty">Save a phrase or story you never want to forget.</p>}
       </section>
 
-      <section className="us-section" aria-labelledby="timeline-title"><h3 id="timeline-title">Our timeline</h3><ul className="us-timeline">{visibleTimelineEvents(timeline).map((item) => <li key={item.id}><div><small>{new Date(item.created_at).toLocaleDateString()}</small><p>{item.summary}</p></div><button className="us-text-button" type="button" aria-pressed={item.pinned} onClick={() => void run(async () => { const { error } = await supabase!.from('relationship_timeline').update({ pinned: !item.pinned }).eq('id', item.id); if (error) throw error })}>{item.pinned ? 'Unpin' : 'Pin'}</button><button className="us-text-button" type="button" onClick={() => void run(async () => { const { error } = await supabase!.from('relationship_timeline').update({ hidden: true }).eq('id', item.id); if (error) throw error })}>Hide</button></li>)}</ul>
+      <section className="us-section" id="us-timeline" aria-labelledby="timeline-title"><h3 id="timeline-title">Our timeline</h3><ul className="us-timeline">{visibleTimelineEvents(timeline).map((item) => <li key={item.id}><div><small>{new Date(item.created_at).toLocaleDateString()}</small><p>{item.summary}</p></div><button className="us-text-button" type="button" aria-pressed={item.pinned} onClick={() => void run(async () => { const { error } = await supabase!.from('relationship_timeline').update({ pinned: !item.pinned }).eq('id', item.id); if (error) throw error })}>{item.pinned ? 'Unpin' : 'Pin'}</button><button className="us-text-button" type="button" onClick={() => void run(async () => { const { error } = await supabase!.from('relationship_timeline').update({ hidden: true }).eq('id', item.id); if (error) throw error })}>Hide</button></li>)}</ul>
         {timeline.length === 0 && <p className="us-empty">Your shared moments will find their way here.</p>}
       </section>
     </>}

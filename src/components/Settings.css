@@ -9,6 +9,10 @@
 .settings-uid-row button { border: 0; border-radius: 999px; padding: 10px 14px; color: #4a252b; background: #ffd8bc; font-weight: 700; cursor: pointer; }
 .settings-uid-row button:disabled { opacity: 0.5; cursor: wait; }
 .settings-volume-row { display: flex; align-items: center; gap: 12px; }
+.settings-music-name, .settings-music-hint { margin: 0; color: var(--hub-muted, #63727c); font-size: 13px; line-height: 1.45; }
+.settings-card input[type='file'] { width: 100%; min-width: 0; }
+.settings-music-reset { min-height: 42px; padding: 8px 12px; border: 1px solid var(--hub-line, #dce5eb); border-radius: 10px; color: #315a71; background: #f9fcfe; font: inherit; cursor: pointer; }
+.settings-music-reset:disabled { opacity: .55; cursor: not-allowed; }
 .settings-volume-row input { flex: 1; accent-color: #ffd8bc; }
 .settings-volume-row span { width: 42px; text-align: right; font-size: 13px; }
 .settings-form input { padding: 11px; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 10px; background: rgba(0, 0, 0, 0.12); color: #fffaf7; }

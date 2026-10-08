@@ -1,6 +1,6 @@
 # Shared Playground: Relationship Features and Android Widgets
 
-**Status:** Approved design; Stages 8–15 complete locally, Stages 16–17 pending.
+**Status:** Approved design; Stages 8–15 complete locally; Stage 16 incomplete; Stage 17 implemented with acceptance follow-ups open (2026-10-08).
 **Date:** 2026-10-06
 **Supersedes:** The future Stage 8 item in `2026-09-30-shared-playground-roadmap.md`. Stages 0–7 remain as recorded there.
 
@@ -21,7 +21,8 @@ Stages 0–10 have been implemented and locally verified. Stage 7 mobile browser
 - [x] Stage 13 — mood check-ins and weekly rituals; local migration, private/shared visibility, and two-account ritual sync passed.
 - [x] Stage 14 — temporary live location; local expiry/cleanup and two-account synthetic-coordinate visibility passed. Actual device geolocation permission/GPS was not exercised.
 - [x] Stage 15 — shared vector Love Board; two-account independent strokes, Realtime visibility, author-only undo, shared clear, and keyboard alternative passed locally. Physical pointer/touch and Android device checks remain unverified.
-- [ ] Stages 16–17 — pending.
+- [ ] Stage 16 — Android companion/widgets; implementation exists, acceptance remains incomplete.
+- [ ] Stage 17 — scheduled surprises; implementation and core local two-account/database checks passed, but acceptance follow-ups remain.
 
 ## Approved scope and order
 
@@ -114,6 +115,8 @@ Each stage is a separate implementation and review cycle. Write a stage-specific
 
 **Exit:** Installable Android build includes independent configurable widget providers and per-instance backgrounds; widget configuration, sign-in/out, privacy, couple isolation, and update paths pass Android/device tests. Existing React/PWA flows remain functional.
 
+**Verification note (2026-10-08):** A cold widget launch exposed a navigation race while Supabase restored the signed-in session; the section scroll now waits for a loaded couple. The emulator confirms the settled Love Note destination. This fixes one route only and does not satisfy the full Stage 16 exit criteria; see the implementation plan and `DOCS.md` for remaining checks.
+
 ### Stage 17 — Scheduled surprises
 
 - Schedule a note, question, photo, challenge, or activity to become visible at a selected future time.
@@ -121,6 +124,8 @@ Each stage is a separate implementation and review cycle. Write a stage-specific
 - Make in-app availability the reliable baseline. Add authenticated push delivery only after the in-app lifecycle passes and platform delivery, privacy, and fallback behavior are tested.
 
 **Exit:** Two accounts verify scheduled content stays hidden until its server-controlled time; notification or network failure does not lose or prematurely reveal content.
+
+**Implementation and verification status (2026-10-08):** Local-only migration and app implementation exist. Two authenticated browser accounts verified pre-release concealment and post-release availability for a note and photo; Stage 17 pgTAP passed 32 checks, and web tests/lint/typecheck/build/diff check plus Android unit/build checks passed. Browser console logs were clear. “Us” jump navigation and local repeating music selection also received browser checks. Stage 17 is not yet accepted: durable screenshot artifacts, narrow/mobile and keyboard checks, offline/retry and browser payload inspection, Android WebView picker verification, and a repeat full local migration replay/schema diff/advisor run remain outstanding. Hosted Supabase was not changed. Stage 16 stays an independent release gate.
 
 ## Widget interaction and freshness constraints
 
